@@ -18,13 +18,26 @@ namespace TestMyBinding
             TestBidirectinnelbinding();
             TestBidirectinnelbindingAndunreferenced();
             TestSimplebindingWithconverter();
+            TestRecursiveBinding();
 
             Console.WriteLine("Enter to exit...");
             Console.ReadLine();
         }
 
+        private static void TestRecursiveBinding()
+        {
+            Console.WriteLine("test Recursive binding with converter");
+            DestinationOfData d = new DestinationOfData();
+            SourceOfData s = new SourceOfData();
+            DataBinder.AddCompiledBinding(s, "Prop1", d, "Prop1DestDouble", new MyConverter());
+            DataBinder.AddCompiledBinding(d, "Prop1DestDouble", s, "Prop1", new MyConverter());
+
+            s.Prop1 = 1234;
+        }
+
         class MyConverter : IBinderConverter<int, int>, IBinderConverter<double, int>
             , IBinderConverter<Point, int>
+            , IBinderConverter<int, double>
         {
             #region IBinderConverter<double,int> Members
 
@@ -52,6 +65,15 @@ namespace TestMyBinding
             {
                 Console.WriteLine("Converter<Point,int>");
                 return new Point(value, value);
+            }
+
+            #endregion
+
+            #region IBinderConverter<int,double> Members
+
+            public int Convert(double value)
+            {
+                return (int)value;
             }
 
             #endregion

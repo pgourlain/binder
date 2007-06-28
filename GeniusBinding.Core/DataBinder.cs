@@ -75,8 +75,10 @@ namespace GeniusBinding.Core
         /// <typeparam name="T"></typeparam>
         class OneBinding<T> : OneBindingBase
         {
+            private bool _HasCalled;
             GetHandlerDelegate<T> _OnGet;
             public OnChangeDelegate<T> _OnChanged;
+            public string PropertyName = string.Empty;
 
             public OneBinding(GetHandlerDelegate<T> getter, OnChangeDelegate<T> onchanged)
             {
@@ -86,8 +88,21 @@ namespace GeniusBinding.Core
 
             public override void Fire(WeakReference weak)
             {
+
                 if (weak.IsAlive)
-                    _OnChanged(_OnGet(weak.Target));
+                {
+                    if (_HasCalled)
+                        throw new Exception(string.Format("The current binding has recursion =>{0}('{1}')", weak.Target.GetType().FullName, PropertyName));
+                    _HasCalled = true;
+                    try
+                    {
+                        _OnChanged(_OnGet(weak.Target));
+                    }
+                    finally
+                    {
+                        _HasCalled = false;
+                    }
+                }
             }
 
             public override void Dispose()
@@ -142,6 +157,7 @@ namespace GeniusBinding.Core
                 else
                 {
                     binding = new OneBinding<T>(gethandler, OnValueChange);
+                    binding.PropertyName = propName;
                     dico[propName] = binding;
                 }
             }
