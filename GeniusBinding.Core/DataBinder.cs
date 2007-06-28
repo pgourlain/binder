@@ -88,7 +88,6 @@ namespace GeniusBinding.Core
 
             public override void Fire(WeakReference weak)
             {
-
                 if (weak.IsAlive)
                 {
                     if (_HasCalled)
