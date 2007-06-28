@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Text;
 using GeniusBinding.Core;
 using System.Diagnostics;
+using System.Drawing;
+using System.ComponentModel;
+using System.Reflection.Emit;
+using System.Reflection;
 
 namespace TestMyBinding
 {
     class Program
     {
-
         static void Main(string[] args)
         {
             TestSimplebinding();
@@ -18,11 +21,51 @@ namespace TestMyBinding
 
             Console.WriteLine("Enter to exit...");
             Console.ReadLine();
+        }
 
+        class MyConverter : IBinderConverter<int, int>, IBinderConverter<double, int>
+            , IBinderConverter<Point, int>
+        {
+            #region IBinderConverter<double,int> Members
+
+            public double Convert(int value)
+            {
+                Console.WriteLine("Converter<double,int> = value+10");
+                return value + 10;
+            }
+
+            #endregion
+
+            #region IBinderConverter<int,int> Members
+
+            int IBinderConverter<int, int>.Convert(int value)
+            {
+                Console.WriteLine("Converter<int,int> = value + 1");
+                return value + 1;
+            }
+
+            #endregion
+
+            #region IBinderConverter<Point,int> Members
+
+            Point IBinderConverter<Point, int>.Convert(int value)
+            {
+                Console.WriteLine("Converter<Point,int>");
+                return new Point(value, value);
+            }
+
+            #endregion
         }
 
         private static void TestSimplebindingWithconverter()
         {
+            Console.WriteLine("test TestSimple binding with converter");
+            DestinationOfData d = new DestinationOfData();
+            SourceOfData s = new SourceOfData();
+            DataBinder.AddCompiledBinding(s, "Prop1", d, "Prop1DestDouble", new MyConverter());
+            DataBinder.AddCompiledBinding(s, "Prop1", d, "PropPoint", new MyConverter());
+
+            s.Prop1 = 1234;
         }
 
         private static void TestBidirectinnelbindingAndunreferenced()

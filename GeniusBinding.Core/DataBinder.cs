@@ -7,6 +7,11 @@ using System.Reflection;
 
 namespace GeniusBinding.Core
 {
+    /// <summary>
+    /// deleguée utiliseée, pour réaliser un "OnChanged" avec la nouvelle valeur
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="value"></param>
     internal delegate void OnChangeDelegate<TValue>(TValue value);
 
     public class DataBinder
@@ -34,7 +39,8 @@ namespace GeniusBinding.Core
                 {
                     return false;
                 }
-                if ((o != this) && (!this.IsAlive || !object.ReferenceEquals(o, this.Target)))
+                EqualityWeakReference other = o as EqualityWeakReference;
+                if ((o != this) && (!this.IsAlive || !object.ReferenceEquals(other.Target, this.Target)))
                 {
                     return false;
                 }
@@ -50,6 +56,9 @@ namespace GeniusBinding.Core
 
 
         #region gestion du binding sur une propriété
+        /// <summary>
+        /// classe de base pour 1 binding
+        /// </summary>
         abstract class OneBindingBase : IDisposable
         {
             public abstract void Fire(WeakReference weak);
@@ -60,6 +69,10 @@ namespace GeniusBinding.Core
             #endregion
         }
 
+        /// <summary>
+        /// classe générique pour le typage fort
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
         class OneBinding<T> : OneBindingBase
         {
             GetHandlerDelegate<T> _OnGet;
@@ -84,6 +97,9 @@ namespace GeniusBinding.Core
         }
         #endregion
 
+        /// <summary>
+        /// liste des abonnements aux sources de données
+        /// </summary>
         static Dictionary<WeakReference, Dictionary<string, OneBindingBase>> _SourceChanged = new Dictionary<WeakReference, Dictionary<string, OneBindingBase>>();
         /// <summary>
         /// gestion de la notification sur INotifyPropertyChanged
@@ -141,6 +157,13 @@ namespace GeniusBinding.Core
         }
 
         #region public methods
+        /// <summary>
+        /// Ajout d'un binding
+        /// </summary>
+        /// <param name="source">la source à observer</param>
+        /// <param name="name">le nom de la propriété à observer</param>
+        /// <param name="destination">l'objet destination</param>
+        /// <param name="nameDest">la propriété destination</param>
         public static void AddCompiledBinding(object source, string name, object destination, string nameDest)
         {
             PropertyInfo piSource;
@@ -149,7 +172,18 @@ namespace GeniusBinding.Core
             helper.AddBinding(source, piSource, destination, piDest);
         }
 
-        public static void AddCompiledBinding<TResult, TSource>(object source, string name, object destination, string nameDest, IBinderConverter<TResult, TSource> converter)
+        /// <summary>
+        /// Ajout d'un binding
+        /// </summary>
+        /// <param name="source">la source à observer</param>
+        /// <param name="name">le nom de la propriété à observer</param>
+        /// <param name="destination">l'objet destination</param>
+        /// <param name="nameDest">la propriété destination</param>
+        /// <param name="converter">converter à utiliser pour "transformer" le type source en type destination</param>
+        /// <exception cref="Exception">
+        /// Si le converter n'implémente pas IBinderConverter&lt;Source, Destination&gt;
+        /// </exception>
+        public static void AddCompiledBinding(object source, string name, object destination, string nameDest, IBinderConverter converter)
         {
             PropertyInfo piSource;
             PropertyInfo piDest;
@@ -161,6 +195,11 @@ namespace GeniusBinding.Core
                 helper.AddBinding(source, piSource, destination, piDest, converter);
         }
 
+        /// <summary>
+        /// Retire l'ensemble des binding d'une propriété
+        /// </summary>
+        /// <param name="source">objet source</param>
+        /// <param name="propName">la propriété concernée</param>
         public static void RemoveCompiledBinding(object source, string propName)
         {
             INotifyPropertyChanged inotify = source as INotifyPropertyChanged;
