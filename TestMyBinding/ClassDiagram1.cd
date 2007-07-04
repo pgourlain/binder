@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Font Name="Tahoma" Size="8.25" />
+  <Class Name="TestMyBinding.BaseData">
+    <Position X="3" Y="1.75" Width="1.75" />
+    <TypeIdentifier>
+      <FileName>BaseData.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAACAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Method Name="~BaseData" Hidden="true" />
+    </Members>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="TestMyBinding.DestinationOfData">
+    <Position X="5.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>DestinationOfData.cs</FileName>
+      <HashCode>IAAAAAAAgAAAAAAEACAAAAAQAAIAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_Point" Hidden="true" />
+      <Field Name="_Prop1Dest" Hidden="true" />
+      <Field Name="_Prop1Destdouble" Hidden="true" />
+    </Members>
+    <InheritanceLine Type="TestMyBinding.BaseData" FixedFromPoint="true">
+      <Path>
+        <Point X="3.938" Y="3.113" />
+        <Point X="3.938" Y="3.965" />
+        <Point X="5.25" Y="3.965" />
+      </Path>
+    </InheritanceLine>
+  </Class>
+  <Class Name="TestMyBinding.Program" Collapsed="true">
+    <Position X="5.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Program.cs</FileName>
+      <HashCode>AACAEAAAAAAAAAAAAAAAgEAAAAAEAAAAAAAABAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TestMyBinding.SourceOfData">
+    <Position X="5.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>SourceOfData.cs</FileName>
+      <HashCode>AAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAACAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_prop1" Hidden="true" />
+    </Members>
+    <InheritanceLine Type="TestMyBinding.BaseData" ManuallyRouted="true" FixedFromPoint="true">
+      <Path>
+        <Point X="4.75" Y="2.5" />
+        <Point X="5.25" Y="2.5" />
+      </Path>
+    </InheritanceLine>
+  </Class>
+  <Class Name="TestMyBinding.TestBindingOperator" Collapsed="true">
+    <Position X="7" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>TestBindingOperator.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+</ClassDiagram>

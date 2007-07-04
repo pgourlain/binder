@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeniusBinding.Core", "GeniusBinding.Core\GeniusBinding.Core.csproj", "{5A70B4FB-7924-4BD1-B3C0-021E85916643}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestMyBinding", "TestMyBinding\TestMyBinding.csproj", "{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs03.codeplex.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = GeniusBinding.Core\\GeniusBinding.Core.csproj
+		SccProjectName1 = GeniusBinding.Core
+		SccLocalPath1 = GeniusBinding.Core
+		SccProjectUniqueName2 = TestMyBinding\\TestMyBinding.csproj
+		SccProjectName2 = TestMyBinding
+		SccLocalPath2 = TestMyBinding
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5A70B4FB-7924-4BD1-B3C0-021E85916643}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A70B4FB-7924-4BD1-B3C0-021E85916643}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A70B4FB-7924-4BD1-B3C0-021E85916643}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A70B4FB-7924-4BD1-B3C0-021E85916643}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
