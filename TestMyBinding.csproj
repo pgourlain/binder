@@ -43,7 +43,6 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SourceOfData.cs" />
-    <Compile Include="TestBindingOperator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GeniusBinding.Core\GeniusBinding.Core.csproj">
