@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Font Name="Tahoma" Size="8.25" />
+  <Class Name="GeniusBinding.Core.DataBinder">
+    <Position X="0.5" Y="2.5" Width="2.5" />
+    <TypeIdentifier>
+      <FileName>DataBinder.cs</FileName>
+      <HashCode>AIAAAAAAAAAAAAAAAEAABAAAAAAAAAAAAAgAAAIAAAA=</HashCode>
+    </TypeIdentifier>
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Class Name="GeniusBinding.Core.DataBinder.EqualityWeakReference" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>DataBinder.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+      <Class Name="GeniusBinding.Core.DataBinder.OneBindingBase" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>DataBinder.cs</NewMemberFileName>
+        </TypeIdentifier>
+        <Lollipop Position="0.2" />
+      </Class>
+      <Class Name="GeniusBinding.Core.DataBinder.OneBinding&lt;T&gt;">
+        <TypeIdentifier>
+          <NewMemberFileName>DataBinder.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+  </Class>
+  <Class Name="GeniusBinding.Core.GetSetHelper&lt;TInstanceSource, TValueSource, TInstanceDest, TValueDest&gt;" BaseTypeListCollapsed="true">
+    <Position X="2.25" Y="0.5" Width="5" />
+    <TypeIdentifier>
+      <FileName>GetSetHelper.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="GeniusBinding.Core.GetSetUtils">
+    <Position X="3.5" Y="1.75" Width="2.75" />
+    <TypeIdentifier>
+      <FileName>GetSetUtils.cs</FileName>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAACAACAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="GeniusBinding.Core.IGetSetHelper">
+    <Position X="7" Y="2.75" Width="2" />
+    <TypeIdentifier>
+      <FileName>GetSetHelper.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="GeniusBinding.Core.IBinderConverter" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>IBinderConvert.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="GeniusBinding.Core.IBinderConverter&lt;TResult, TValue&gt;" Collapsed="true">
+    <Position X="0.5" Y="1.75" Width="2.75" />
+    <TypeIdentifier>
+      <FileName>IBinderConvert.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Interface>
+  <Delegate Name="GeniusBinding.Core.OnChangeDelegate&lt;TValue&gt;">
+    <Position X="7" Y="1.75" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>DataBinder.cs</FileName>
+      <HashCode>EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="GeniusBinding.Core.GetHandlerDelegate&lt;TResult&gt;">
+    <Position X="6.25" Y="4" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>GetSetUtils.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="GeniusBinding.Core.SetHandlerDelegate&lt;TValue&gt;">
+    <Position X="3.5" Y="4" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>GetSetUtils.cs</FileName>
+      <HashCode>AAAAAAAIAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Delegate>
+</ClassDiagram>
