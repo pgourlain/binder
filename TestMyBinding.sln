@@ -5,9 +5,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeniusBinding.Core", "Geniu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestMyBinding", "TestMyBinding\TestMyBinding.csproj", "{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeniusBinding.Core.Tests", "GeniusBinding.Core.Tests\GeniusBinding.Core.Tests.csproj", "{2A6C8F32-CE25-4020-BAB7-9F977A8347E1}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
+		SccNumberOfProjects = 4
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs03.codeplex.com/
 		SccLocalPath0 = .
@@ -17,6 +19,9 @@ Global
 		SccProjectUniqueName2 = TestMyBinding\\TestMyBinding.csproj
 		SccProjectName2 = TestMyBinding
 		SccLocalPath2 = TestMyBinding
+		SccProjectUniqueName3 = GeniusBinding.Core.Tests\\GeniusBinding.Core.Tests.csproj
+		SccProjectName3 = GeniusBinding.Core.Tests
+		SccLocalPath3 = GeniusBinding.Core.Tests
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +36,10 @@ Global
 		{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A6C8F32-CE25-4020-BAB7-9F977A8347E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A6C8F32-CE25-4020-BAB7-9F977A8347E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A6C8F32-CE25-4020-BAB7-9F977A8347E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A6C8F32-CE25-4020-BAB7-9F977A8347E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

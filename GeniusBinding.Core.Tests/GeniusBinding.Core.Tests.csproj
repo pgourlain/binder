@@ -4,11 +4,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{5A70B4FB-7924-4BD1-B3C0-021E85916643}</ProjectGuid>
+    <ProjectGuid>{2A6C8F32-CE25-4020-BAB7-9F977A8347E1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GeniusBinding.Core</RootNamespace>
-    <AssemblyName>GeniusBinding.Core</AssemblyName>
+    <RootNamespace>GeniusBinding.Core.Tests</RootNamespace>
+    <AssemblyName>GeniusBinding.Core.Tests</AssemblyName>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
@@ -32,24 +32,26 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.4.1.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Check.cs" />
-    <Compile Include="CompiledBindingException.cs" />
-    <Compile Include="EqualityWeekReference.cs" />
-    <Compile Include="GetSetUtils.cs" />
-    <Compile Include="IBinderConvert.cs" />
-    <Compile Include="IPropertyPathBinding.cs" />
+    <Compile Include="BaseData.cs" />
+    <Compile Include="DataBinderTest.cs" />
+    <Compile Include="HierarchicalData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="DataBinder.cs" />
-    <Compile Include="PropertyPathBindingItem.cs" />
-    <Compile Include="RealBinding.cs" />
+    <Compile Include="SourceOfData.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="geniusbindingdiagram.cd" />
+    <ProjectReference Include="..\GeniusBinding.Core\GeniusBinding.Core.csproj">
+      <Project>{5A70B4FB-7924-4BD1-B3C0-021E85916643}</Project>
+      <Name>GeniusBinding.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
