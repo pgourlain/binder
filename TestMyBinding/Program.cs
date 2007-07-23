@@ -14,14 +14,72 @@ namespace TestMyBinding
     {
         static void Main(string[] args)
         {
-            TestSimplebinding();
-            TestBidirectinnelbinding();
-            TestBidirectinnelbindingAndunreferenced();
-            TestSimplebindingWithconverter();
-            TestRecursiveBinding();
-
+            //TestSimplebinding();
+            //TestBidirectinnelbinding();
+            //TestBidirectinnelbindingAndunreferenced();
+            //TestSimplebindingWithconverter();
+            ////TestRecursiveBinding();
+            //TestPropertyPathBinding();
+            TestException();
             Console.WriteLine("Enter to exit...");
             Console.ReadLine();
+        }
+
+        private static void TestException()
+        {
+            //HierarchicalData destination = new HierarchicalData();
+            //SourceOfData source = new SourceOfData();
+
+            //DataBinder.AddCompiledBinding(source, "A.Prop1", destination, "A.B.C.Prop1");
+            //source.Prop1 = 25;
+            HierarchicalData source = new HierarchicalData();
+            HierarchicalData destination = new HierarchicalData();
+
+            DataBinder.AddCompiledBinding(source, "A.B.C.Prop1", destination, "A.B.C.Prop1");
+
+            source.A.B.C.Prop1 = 25;
+            AreEqual(source.A.B.C.Prop1, destination.A.B.C.Prop1, "binding doesn't work !");
+            AreEqual(25, destination.A.B.C.Prop1, "binding doesn't work !");
+            HierarchicalDataA oldA = source.A;
+
+            source.A = new HierarchicalDataA("test");
+            oldA.B.C.Prop1 = 123;
+            AreEqual(25, destination.A.B.C.Prop1, "binding doesn't work !");
+            source.A.B.C.Prop1 = 456;
+            AreEqual(456, destination.A.B.C.Prop1, "binding doesn't work !");
+            source.A = new HierarchicalDataA("test1");
+            source.A.B.C.Prop1 = 789;
+            AreEqual(789, destination.A.B.C.Prop1, "binding doesn't work !");
+
+            oldA = destination.A;
+            destination.A = new HierarchicalDataA("test a");
+            source.A.B.C.Prop1 = 790;
+            AreEqual(790, destination.A.B.C.Prop1, "binding doesn't work !");
+            AreEqual(789, oldA.B.C.Prop1, "binding doesn't work !");
+        }
+
+        private static void AreEqual(int p, int p_2, string p_3)
+        {
+            if (p != p_2)
+                throw new Exception(p_3);
+        }
+
+        private static void TestPropertyPathBinding()
+        {
+            Console.WriteLine("test binding property 'A.B.C.Prop1' of source in Prop1DestDouble of destination");
+            HierarchicalData source = new HierarchicalData();
+            DestinationOfData d = new DestinationOfData();
+            DataBinder.AddCompiledBinding(source, "A.B.C.Prop1", d, "Prop1Dest");
+
+
+            Console.WriteLine("try to changed A");
+            source.A.B.C.Prop1 = 777;
+            HierarchicalDataA A = source.A;
+            source.A = new HierarchicalDataA("pgo");
+            Console.WriteLine("try to changed A.B.C.Prop1");
+            source.A.B.C.Prop1 = 789;
+            source.A = null;
+            A.B.C.Prop1 = 789;
         }
 
         private static void TestRecursiveBinding()

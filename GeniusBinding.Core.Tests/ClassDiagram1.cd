@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Font Name="Tahoma" Size="8.25" />
+  <Class Name="GeniusBinding.Core.Tests.BaseNode">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>HierarchicalData.cs</FileName>
+      <HashCode>AAACAABAAAAAAAgAAAAAAAAAkAAAAAABCACAAAAEAAA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_Id" Hidden="true" />
+      <Field Name="_Left" Hidden="true" />
+      <Field Name="_Right" Hidden="true" />
+      <Method Name="~BaseNode" Hidden="true" />
+      <Method Name="BaseNode" Hidden="true" />
+      <Method Name="DoChanged" Hidden="true" />
+      <Event Name="OnFinalized" Hidden="true" />
+      <Event Name="PropertyChanged" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+      <Compartment Name="Events" Collapsed="true" />
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GeniusBinding.Core.Tests.MyNode&lt;TData&gt;">
+    <Position X="0.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>HierarchicalData.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAIAAA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_UserData" Hidden="true" />
+      <Method Name="MyNode" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+  </Class>
+</ClassDiagram>

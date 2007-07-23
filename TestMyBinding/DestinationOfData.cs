@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Diagnostics;
 using System.Drawing;
+using System.ComponentModel;
 
 namespace TestMyBinding
 {
-    class DestinationOfData : BaseData
+    class DestinationOfData : INotifyPropertyChanged
     {
         int _Prop1Dest;
 
@@ -57,5 +58,16 @@ namespace TestMyBinding
             }
         }
 
+
+        #region INotifyPropertyChanged Members
+        protected void DoPropertyChanged(string propName)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propName));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
     }
 }

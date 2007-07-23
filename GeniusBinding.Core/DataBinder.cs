@@ -4,6 +4,7 @@ using System.Text;
 using System.ComponentModel;
 using System.Reflection.Emit;
 using System.Reflection;
+using System.Collections.ObjectModel;
 
 namespace GeniusBinding.Core
 {
@@ -16,79 +17,41 @@ namespace GeniusBinding.Core
 
     public class DataBinder
     {
-        #region pour ne garder que des références faibles sur les objets bindés
-        private sealed class EqualityWeakReference : WeakReference
-        {
-            // Fields
-            private int _hashCode;
-
-            // Methods
-            internal EqualityWeakReference(object o)
-                : base(o)
-            {
-                this._hashCode = o.GetHashCode();
-            }
-
-            public override bool Equals(object o)
-            {
-                if (o == null)
-                {
-                    return false;
-                }
-                if (o.GetHashCode() != this._hashCode)
-                {
-                    return false;
-                }
-                EqualityWeakReference other = o as EqualityWeakReference;
-                if ((o != this) && (!this.IsAlive || !object.ReferenceEquals(other.Target, this.Target)))
-                {
-                    return false;
-                }
-                return true;
-            }
-
-            public override int GetHashCode()
-            {
-                return this._hashCode;
-            }
-        }
-        #endregion
-
-
-        #region gestion du binding sur une propriété
+        #region gestion de la notification d'une propriété
         /// <summary>
-        /// classe de base pour 1 binding
+        /// interface définissant 
         /// </summary>
-        abstract class OneBindingBase : IDisposable
+        interface IOneNotify : IDisposable
         {
-            public abstract void Fire(WeakReference weak);
+            void Fire(WeakReference weak);
 
-            #region IDisposable Members
+            void EnableDisable(bool value);
 
-            public abstract void Dispose();
-            #endregion
+            Delegate OnChanged { get; set;}
         }
 
         /// <summary>
         /// classe générique pour le typage fort
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        class OneBinding<T> : OneBindingBase
+        class OneNotify<T> : IOneNotify
         {
             private bool _HasCalled;
             GetHandlerDelegate<T> _OnGet;
             public OnChangeDelegate<T> _OnChanged;
             public string PropertyName = string.Empty;
+            private bool _BindingEnabled = true;
 
-            public OneBinding(GetHandlerDelegate<T> getter, OnChangeDelegate<T> onchanged)
+            public OneNotify(GetHandlerDelegate<T> getter, OnChangeDelegate<T> onchanged)
             {
                 _OnGet = getter;
                 _OnChanged = onchanged;
             }
 
-            public override void Fire(WeakReference weak)
+            #region IOneNotify
+            public void Fire(WeakReference weak)
             {
-                if (weak.IsAlive)
+                if (weak.IsAlive && _BindingEnabled)
                 {
                     if (_HasCalled)
                         throw new Exception(string.Format("The current binding has recursion =>{0}('{1}')", weak.Target.GetType().FullName, PropertyName));
@@ -104,17 +67,34 @@ namespace GeniusBinding.Core
                 }
             }
 
-            public override void Dispose()
+            public void EnableDisable(bool value)
+            {
+                _BindingEnabled = value;
+            }
+
+            public void Dispose()
             {
                 _OnChanged = null;
             }
+            public Delegate OnChanged
+            {
+                get { return _OnChanged; }
+                set
+                {
+                    _OnChanged = (OnChangeDelegate<T>)value;
+                }
+            }
+            #endregion
         }
         #endregion
 
         /// <summary>
         /// liste des abonnements aux sources de données
         /// </summary>
-        static Dictionary<WeakReference, Dictionary<string, OneBindingBase>> _SourceChanged = new Dictionary<WeakReference, Dictionary<string, OneBindingBase>>();
+        static Dictionary<WeakReference, Dictionary<string, IOneNotify>> _SourceChanged = new Dictionary<WeakReference, Dictionary<string, IOneNotify>>();
+        static List<IPropertyPathBinding> _Bindings = new List<IPropertyPathBinding>();
+        
+        #region notification
         /// <summary>
         /// gestion de la notification sur INotifyPropertyChanged
         /// </summary>
@@ -130,14 +110,14 @@ namespace GeniusBinding.Core
             {
                 WeakReference weak = new EqualityWeakReference(inotify);
                 //le but est ici de ne s'abonner qu'une fois
-                Dictionary<string, OneBindingBase> dico = null;
+                Dictionary<string, IOneNotify> dico = null;
                 if (_SourceChanged.ContainsKey(weak))
                 {
                     dico = _SourceChanged[weak];
                 }
                 else
-                {   
-                    dico = new Dictionary<string, OneBindingBase>();
+                {
+                    dico = new Dictionary<string, IOneNotify>();
                     _SourceChanged.Add(weak, dico);
                     inotify.PropertyChanged += delegate(object sender, PropertyChangedEventArgs e)
                         {
@@ -147,89 +127,143 @@ namespace GeniusBinding.Core
                         };
                 }
                 ///plusieurs abonnement si nécessaire pour une propriété binding de 1 prop vers plusieurs dest
-                OneBinding<T> binding = null;
+                OneNotify<T> binding = null;
                 if (dico.ContainsKey(propName))
                 {
-                    binding = (OneBinding<T>)dico[propName];
+                    binding = (OneNotify<T>)dico[propName];
                     binding._OnChanged = (OnChangeDelegate<T>)Delegate.Combine(binding._OnChanged, OnValueChange);
                 }
                 else
                 {
-                    binding = new OneBinding<T>(gethandler, OnValueChange);
+                    binding = new OneNotify<T>(gethandler, OnValueChange);
                     binding.PropertyName = propName;
                     dico[propName] = binding;
                 }
             }
         }
 
-        private static IGetSetHelper GetHelper(object source, string name, object destination, string nameDest, out PropertyInfo piSource, out PropertyInfo piDest)
-        {
-            piSource = source.GetType().GetProperty(name);
-            piDest = destination.GetType().GetProperty(nameDest);
-            Type t = typeof(GetSetHelper<,,,>);
-            Type helperType = t.MakeGenericType(source.GetType(), piSource.PropertyType, destination.GetType(), piDest.PropertyType);
-            return (IGetSetHelper)Activator.CreateInstance(helperType);
-        }
-
-        #region public methods
-        /// <summary>
-        /// Ajout d'un binding
-        /// </summary>
-        /// <param name="source">la source à observer</param>
-        /// <param name="name">le nom de la propriété à observer</param>
-        /// <param name="destination">l'objet destination</param>
-        /// <param name="nameDest">la propriété destination</param>
-        public static void AddCompiledBinding(object source, string name, object destination, string nameDest)
-        {
-            PropertyInfo piSource;
-            PropertyInfo piDest;
-            IGetSetHelper helper = GetHelper(source, name, destination, nameDest, out piSource, out piDest);
-            helper.AddBinding(source, piSource, destination, piDest);
-        }
-
-        /// <summary>
-        /// Ajout d'un binding
-        /// </summary>
-        /// <param name="source">la source à observer</param>
-        /// <param name="name">le nom de la propriété à observer</param>
-        /// <param name="destination">l'objet destination</param>
-        /// <param name="nameDest">la propriété destination</param>
-        /// <param name="converter">converter à utiliser pour "transformer" le type source en type destination</param>
-        /// <exception cref="Exception">
-        /// Si le converter n'implémente pas IBinderConverter&lt;Source, Destination&gt;
-        /// </exception>
-        public static void AddCompiledBinding(object source, string name, object destination, string nameDest, IBinderConverter converter)
-        {
-            PropertyInfo piSource;
-            PropertyInfo piDest;
-
-            IGetSetHelper helper = GetHelper(source, name, destination, nameDest, out piSource, out piDest);
-            if (converter == null)
-                helper.AddBinding(source, piSource, destination, piDest);
-            else
-                helper.AddBinding(source, piSource, destination, piDest, converter);
-        }
-
-        /// <summary>
-        /// Retire l'ensemble des binding d'une propriété
-        /// </summary>
-        /// <param name="source">objet source</param>
-        /// <param name="propName">la propriété concernée</param>
-        public static void RemoveCompiledBinding(object source, string propName)
+        internal static void RemoveNotify(object source, string propName, Delegate del)
         {
             INotifyPropertyChanged inotify = source as INotifyPropertyChanged;
             if (inotify != null)
             {
                 WeakReference weak = new EqualityWeakReference(inotify);
+                //le but est ici de ne s'abonner qu'une fois
+                Dictionary<string, IOneNotify> dico = null;
                 if (_SourceChanged.ContainsKey(weak))
                 {
-                    Dictionary<string, OneBindingBase> dico = _SourceChanged[weak];
+                    dico = _SourceChanged[weak];
                     if (dico.ContainsKey(propName))
                     {
-                        dico[propName].Dispose();
-                        dico.Remove(propName);
+                        dico[propName].OnChanged = Delegate.Remove(dico[propName].OnChanged, del);
+                        if (dico[propName].OnChanged == null)
+                            dico.Remove(propName);
                     }
                 }
+            }
+        }
+
+        internal static void RemoveBinding(IPropertyPathBinding binding)
+        {
+            _Bindings.Remove(binding);
+        }
+        #endregion
+
+        #region public methods
+        public static void AddCompiledBinding(object source, string propertypath, object destination, string destPropertypath)
+        {
+            Check.IsNotNull("source", source);
+            Check.IsNotNull("propertypath", propertypath);
+            Check.IsNotNull("destination", destination);
+            Check.IsNotNull("destPropertypath", destPropertypath);
+            string[] pathItems = propertypath.Split('.');
+
+            
+            PropertyPathBindingItem item = new PropertyPathBindingItem(source, propertypath, destination, destPropertypath, null);
+            _Bindings.Add(item);
+        }
+
+        /// <summary>
+        /// ajoute un binding
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="propertypath"></param>
+        /// <param name="destination"></param>
+        /// <param name="destPropertypath"></param>
+        /// <param name="converter"></param>
+        public static void AddCompiledBinding(object source, string propertypath, object destination, string destPropertypath, IBinderConverter converter)
+        {
+            Check.IsNotNull("source", source);
+            Check.IsNotNull("propertypath", propertypath);
+            Check.IsNotNull("destination", destination);
+            Check.IsNotNull("destPropertypath", destPropertypath);
+            string[] pathItems = propertypath.Split('.');
+
+
+            PropertyPathBindingItem item = new PropertyPathBindingItem(source, propertypath, destination, destPropertypath, converter);
+            _Bindings.Add(item);
+        }
+
+        /// <summary>
+        /// enlève un binding
+        /// </summary>
+        /// <param name="source">instance de la source concernée</param>
+        /// <param name="propertypath"></param>
+        /// <param name="destination"></param>
+        /// <param name="destPropertypath"></param>
+        public static void RemoveCompiledBinding(object source, string propertypath, object destination, string destPropertypath)
+        {
+            List<IPropertyPathBinding> lToUnbind = new List<IPropertyPathBinding>();
+            //find it and unbind
+            foreach (IPropertyPathBinding item in Bindings)
+            {
+                if (item.PropertyPathSource == propertypath && item.PropertyPathDestination == destPropertypath &&
+                    item.Source == source && item.Destination == destination)
+                {
+                    lToUnbind.Add(item);
+                }
+            }
+            //
+            foreach (IPropertyPathBinding item in lToUnbind)
+                item.UnBind();
+        }
+
+        /// <summary>
+        /// enlève un binding
+        /// </summary>
+        /// <param name="binding"></param>
+        public static void RemoveCompiledBinding(IPropertyPathBinding binding)
+        {
+            binding.UnBind();
+        }
+
+        /// <summary>
+        /// Active/Désctive un binding à partir de sa source
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public static void EnableDisableBinding(object source, string name, bool value)
+        {
+            EqualityWeakReference src =new EqualityWeakReference(source);
+            if (_SourceChanged.ContainsKey(src))
+            {
+                Dictionary<string, IOneNotify> dico = _SourceChanged[src];
+                if (dico.ContainsKey(name))
+                {
+                    dico[name].EnableDisable(value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Liste complète des bindings
+        /// </summary>
+        public static ReadOnlyCollection<IPropertyPathBinding> Bindings
+        {
+            get
+            {
+                return new ReadOnlyCollection<IPropertyPathBinding>(_Bindings);
             }
         }
         #endregion
