@@ -42,6 +42,7 @@
     <Compile Include="EqualityWeekReference.cs" />
     <Compile Include="GetSetUtils.cs" />
     <Compile Include="IBinderConvert.cs" />
+    <Compile Include="IOneNotify.cs" />
     <Compile Include="IPropertyPathBinding.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataBinder.cs" />

@@ -5,17 +5,12 @@
     <Position X="0.5" Y="2.5" Width="2.5" />
     <TypeIdentifier>
       <FileName>DataBinder.cs</FileName>
-      <HashCode>AIAAAABAAAAAAAAGAEAAAAAAAAAAAAAAAEgAAAoAAAA=</HashCode>
+      <HashCode>AIAAAABACAAAAAAGAEAAAAAAAAAAAAAAAEgAAAoAAAA=</HashCode>
     </TypeIdentifier>
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <NestedTypes>
-      <Interface Name="GeniusBinding.Core.DataBinder.IOneNotify" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>DataBinder.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Interface>
       <Class Name="GeniusBinding.Core.DataBinder.OneNotify&lt;T&gt;">
         <TypeIdentifier>
           <NewMemberFileName>DataBinder.cs</NewMemberFileName>

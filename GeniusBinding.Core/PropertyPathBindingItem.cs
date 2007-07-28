@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace GeniusBinding.Core
 {
@@ -11,7 +12,13 @@ namespace GeniusBinding.Core
     /// </summary>
     class PropertyPathBindingItem : IPropertyPathBinding
     {
+        /// <summary>
+        /// Path complet pour la source
+        /// </summary>
         private string _PropertyPath;
+        /// <summary>
+        /// path complet pour la destination
+        /// </summary>
         private string _PropertyPathDest;
 
         class PathItem
@@ -28,14 +35,32 @@ namespace GeniusBinding.Core
             public int Index;
         }
 
+        /// <summary>
+        /// objet source
+        /// </summary>
         EqualityWeakReference _Source;
+        /// <summary>
+        /// objet destination
+        /// </summary>
         EqualityWeakReference _Destination;
+        /// <summary>
+        /// toute les propriétés du path source "splitées"
+        /// </summary>
         string[] _PathItems;
+        /// <summary>
+        /// les objets référence chaque propriété du path
+        /// </summary>
         PathItem[] _Items;
 
         string[] _DestPathItems;
         PathItem[] _DestItems;
+        /// <summary>
+        /// le binding entre la dernière section de la source, avec la dernière section de la destination
+        /// </summary>
         IRealBinding _CurrentBinding;
+        /// <summary>
+        /// le converter à utiliser lors du binding
+        /// </summary>
         IBinderConverter _Converter;
 
         /// <summary>
@@ -86,12 +111,21 @@ namespace GeniusBinding.Core
             }
         }
 
-        private bool _Enabled;
-
         public bool Enabled
         {
-            get { return _Enabled; }
-            set { _Enabled = value; }
+            get 
+            {
+                IOneNotify prop = DataBinder.GetOneNotify(this._Source.Target, _PathItems[_PathItems.Length - 1]);
+                if (prop != null)
+                    return prop.Enabled;
+                return false;
+            }
+            set 
+            {
+                IOneNotify prop = DataBinder.GetOneNotify(this._Source.Target, _PathItems[_PathItems.Length - 1]);
+                if (prop != null)
+                    prop.Enabled = value;
+            }
         }
 
 
@@ -104,7 +138,17 @@ namespace GeniusBinding.Core
         {
             get { return _Destination.Target; }
         }
+
+        public bool IsAlive 
+        {
+            get
+            {
+                return _Source.IsAlive && _Destination.IsAlive;
+            }
+        }
+
         #endregion
+
         #region méthodes privées
         private void InternalUnBind()
         {
