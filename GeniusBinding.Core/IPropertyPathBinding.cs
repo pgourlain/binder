@@ -34,6 +34,11 @@ namespace GeniusBinding.Core
         /// <summary>
         /// Active / désactive le binding
         /// </summary>
-        bool Enabled { get; set;}        
+        bool Enabled { get; set;}
+
+        /// <summary>
+        /// renvoi true, si l'objet source et destination son encore en vie
+        /// </summary>
+        bool IsAlive { get;}
     }
 }

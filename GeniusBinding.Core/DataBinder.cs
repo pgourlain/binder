@@ -19,18 +19,6 @@ namespace GeniusBinding.Core
     {
         #region gestion de la notification d'une propriété
         /// <summary>
-        /// interface définissant 
-        /// </summary>
-        interface IOneNotify : IDisposable
-        {
-            void Fire(WeakReference weak);
-
-            void EnableDisable(bool value);
-
-            Delegate OnChanged { get; set;}
-        }
-
-        /// <summary>
         /// classe générique pour le typage fort
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -67,9 +55,16 @@ namespace GeniusBinding.Core
                 }
             }
 
-            public void EnableDisable(bool value)
+            public bool Enabled
             {
-                _BindingEnabled = value;
+                get
+                {
+                    return _BindingEnabled;
+                }
+                set
+                {
+                    _BindingEnabled = value;
+                }
             }
 
             public void Dispose()
@@ -95,6 +90,23 @@ namespace GeniusBinding.Core
         static List<IPropertyPathBinding> _Bindings = new List<IPropertyPathBinding>();
         
         #region notification
+        internal static IOneNotify GetOneNotify(object source, string propName)
+        {
+            INotifyPropertyChanged inotify = source as INotifyPropertyChanged;
+            if (inotify != null)
+            {
+                WeakReference weak = new EqualityWeakReference(inotify);
+                //le but est ici de ne s'abonner qu'une fois
+                Dictionary<string, IOneNotify> dico = null;
+                if (_SourceChanged.TryGetValue(weak, out dico))
+                {
+                    IOneNotify result = null;
+                    dico.TryGetValue(propName, out result);
+                    return result;
+                }
+            }
+            return null;
+        }
         /// <summary>
         /// gestion de la notification sur INotifyPropertyChanged
         /// </summary>
@@ -245,15 +257,9 @@ namespace GeniusBinding.Core
         /// <param name="value"></param>
         public static void EnableDisableBinding(object source, string name, bool value)
         {
-            EqualityWeakReference src =new EqualityWeakReference(source);
-            if (_SourceChanged.ContainsKey(src))
-            {
-                Dictionary<string, IOneNotify> dico = _SourceChanged[src];
-                if (dico.ContainsKey(name))
-                {
-                    dico[name].EnableDisable(value);
-                }
-            }
+            IOneNotify prop = GetOneNotify(source, name);
+            if (prop != null)
+                prop.Enabled = value;
         }
 
         /// <summary>

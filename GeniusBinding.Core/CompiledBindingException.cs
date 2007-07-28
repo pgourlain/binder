@@ -5,6 +5,9 @@ using System.Runtime.Serialization;
 
 namespace GeniusBinding.Core
 {
+    /// <summary>
+    /// Exception pour le binding compilé
+    /// </summary>
     [Serializable]
     public class CompiledBindingException : Exception
     {

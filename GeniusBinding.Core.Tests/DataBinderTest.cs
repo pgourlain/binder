@@ -240,14 +240,45 @@ namespace GeniusBinding.Core.Tests
             Assert.AreEqual(actual, DataBinder.Bindings.Count, "add/remove doesn't work !");
         }
 
-        //[Test(Description = "")]
-        //public void Test12()
-        //{
-        //}
-        //[Test(Description = "")]
-        //public void Test13()
-        //{
-        //}
+        [Test(Description = "test Enabled/Disabled")]
+        public void Test12()
+        {
+            SourceOfData source = new SourceOfData();
+            SourceOfData destination = new SourceOfData();
+            DataBinder.AddCompiledBinding(source, "Prop1", destination, "Prop1");
+            source.Prop1 = 123;
+            Assert.AreEqual(123, destination.Prop1, "binding doesn't work !");
+            Assert.AreEqual(source.Prop1, destination.Prop1, "binding doesn't work !");
+            Console.WriteLine("binding count : {0}", DataBinder.Bindings.Count);
+            DataBinder.Bindings[DataBinder.Bindings.Count-1].Enabled = false;
+            source.Prop1 = 456;
+            Assert.AreEqual(456, source.Prop1, "binding doesn't work !");
+            Assert.AreEqual(123, destination.Prop1, "binding doesn't work !");
+            DataBinder.Bindings[DataBinder.Bindings.Count - 1].Enabled = true;
+            source.Prop1 = 789;
+            Assert.AreEqual(789, destination.Prop1, "binding doesn't work !");
+            Assert.AreEqual(source.Prop1, destination.Prop1, "binding doesn't work !");
+        }
+
+        [Test(Description = "test Enabled/Disabled by DataBinder.EnableDisableBinding")]
+        public void Test13()
+        {
+            SourceOfData source = new SourceOfData();
+            SourceOfData destination = new SourceOfData();
+            DataBinder.AddCompiledBinding(source, "Prop1", destination, "Prop1");
+            source.Prop1 = 123;
+            Assert.AreEqual(123, destination.Prop1, "binding doesn't work !");
+            Assert.AreEqual(source.Prop1, destination.Prop1, "binding doesn't work !");
+            Console.WriteLine("binding count : {0}", DataBinder.Bindings.Count);
+            DataBinder.EnableDisableBinding(source, "Prop1", false);
+            source.Prop1 = 456;
+            Assert.AreEqual(456, source.Prop1, "binding doesn't work !");
+            Assert.AreEqual(123, destination.Prop1, "binding doesn't work !");
+            DataBinder.EnableDisableBinding(source, "Prop1", true);
+            source.Prop1 = 789;
+            Assert.AreEqual(789, destination.Prop1, "binding doesn't work !");
+            Assert.AreEqual(source.Prop1, destination.Prop1, "binding doesn't work !");
+        }
         //[Test(Description = "")]
         //public void Test14()
         //{
