@@ -26,6 +26,21 @@
       <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAACAACAAAAAAAAAAAA=</HashCode>
     </TypeIdentifier>
   </Class>
+  <Class Name="GeniusBinding.Core.CollectionChangedEventArgs">
+    <Position X="7.25" Y="5.25" Width="2.25" />
+    <TypeIdentifier>
+      <FileName>ICollectionChanged.cs</FileName>
+      <HashCode>AAEAgAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAgAAAQAAQ=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="_Action" Hidden="true" />
+      <Field Name="_NewIndex" Hidden="true" />
+      <Field Name="_OldIndex" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+  </Class>
   <Interface Name="GeniusBinding.Core.IBinderConverter" Collapsed="true">
     <Position X="0.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
@@ -40,6 +55,27 @@
       <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
     </TypeIdentifier>
   </Interface>
+  <Interface Name="GeniusBinding.Core.IOneNotify">
+    <Position X="3.5" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>IOneNotify.cs</FileName>
+      <HashCode>AAAAAAAAAQAAAIAAAAAAAAAAAAAEAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="GeniusBinding.Core.ICollectionChanged">
+    <Position X="5.25" Y="5.25" Width="1.75" />
+    <TypeIdentifier>
+      <FileName>ICollectionChanged.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="GeniusBinding.Core.CollectionChangedAction">
+    <Position X="3.5" Y="7.25" Width="2" />
+    <TypeIdentifier>
+      <FileName>ICollectionChanged.cs</FileName>
+      <HashCode>AAIAAAAAAIAABAAAAAAABAAAAAAAAAAAAAAAAAAAACA=</HashCode>
+    </TypeIdentifier>
+  </Enum>
   <Delegate Name="GeniusBinding.Core.OnChangeDelegate&lt;TValue&gt;">
     <Position X="7" Y="1.75" Width="2.25" />
     <TypeIdentifier>

@@ -9,6 +9,7 @@ namespace GeniusBinding.Core.Tests
     public class DataBinderTest
     {
         #region methodes utilitaire pour les tests
+
         private BaseNode CreateSourceTree(string id, int level)
         {
             MyNode<int> Result = new MyNode<int>(id, 0);
@@ -22,17 +23,35 @@ namespace GeniusBinding.Core.Tests
             return Result;
         }
 
+        private MyNode<DataWithBindingList> CreateSourceTreeList(string id, int level)
+        {
+            MyNode<DataWithBindingList> Result = new MyNode<DataWithBindingList>(id, new DataWithBindingList());
+            if (level > 0)
+            {
+                if (level % 2 != 0)
+                    Result.Right = CreateSourceTreeList(string.Format("{0}.{1}", id, level), level - 1);
+                else
+                    Result.Left = CreateSourceTreeList(string.Format("{0}.{1}", id, level), level - 1);
+            }
+            return Result;
+        }
+
         private MyNode<int> GetFeuille(BaseNode destination, int level)
+        {
+            return GetFeuille<int>((MyNode<int>)destination, level) ;
+        }
+
+        private MyNode<T> GetFeuille<T>(MyNode<T> destination, int level)
         {
             while (level > 0)
             {
                 if (level % 2 != 0)
-                    destination = destination.Right;
+                    destination = (MyNode<T>)destination.Right;
                 else
-                    destination = destination.Left;
+                    destination = (MyNode<T>)destination.Left;
                 level--;
             }
-            return (MyNode<int>)destination;
+            return (MyNode<T>)destination;
         }
 
         #endregion
@@ -201,7 +220,8 @@ namespace GeniusBinding.Core.Tests
             destination.Left = CreateSourceTree("destroot1", 1);
             
             feuilleSource.UserData = 7894;
-            Assert.AreEqual(1235, feuilledest.UserData);
+            //Destination reprend la valeur par défaut
+            Assert.AreEqual(0, feuilledest.UserData);
             MyNode<int> feuilledest1 = GetFeuille(destination, 2);
 
             Assert.AreEqual(0, feuilledest1.UserData);
@@ -279,32 +299,174 @@ namespace GeniusBinding.Core.Tests
             Assert.AreEqual(789, destination.Prop1, "binding doesn't work !");
             Assert.AreEqual(source.Prop1, destination.Prop1, "binding doesn't work !");
         }
+
+        [Test(Description = "test binding with null reference in middle of path of source")]
+        public void Test14()
+        {
+            BaseNode source = CreateSourceTree("root", 2);
+            BaseNode destination = CreateSourceTree("root dest", 2);
+
+            DataBinder.AddCompiledBinding(source, "Left.Right.UserData", destination, "Left.Right.UserData");
+
+            MyNode<int> feuilleSource = GetFeuille(source, 2);
+            MyNode<int> feuilledest = GetFeuille(destination, 2);
+
+            feuilleSource.UserData = 1235;
+            Assert.AreEqual(feuilleSource.UserData, feuilledest.UserData);
+            Assert.AreEqual(1235, feuilledest.UserData);
+            source.Left.Right = null;
+            feuilleSource.UserData = 1235;
+            Assert.AreEqual(1235, feuilledest.UserData);
+        }
+
+        [Test(Description = "test binding with null reference in middle of path destination")]
+        public void Test15()
+        {
+            BaseNode source = CreateSourceTree("root", 2);
+            BaseNode destination = CreateSourceTree("root dest", 2);
+
+            DataBinder.AddCompiledBinding(source, "Left.Right.UserData", destination, "Left.Right.UserData");
+
+            MyNode<int> feuilleSource = GetFeuille(source, 2);
+            MyNode<int> feuilledest = GetFeuille(destination, 2);
+
+            feuilleSource.UserData = 1235;
+            Assert.AreEqual(feuilleSource.UserData, feuilledest.UserData);
+            Assert.AreEqual(1235, feuilledest.UserData);
+            destination.Left.Right = null;
+            feuilleSource.UserData = 1235;
+            Assert.AreEqual(1235, feuilledest.UserData);
+        }
+
+        [Test(Description = "test binding with null reference in middle of paths before binding")]
+        public void Test16()
+        {
+            BaseNode source = CreateSourceTree("root", 2);
+            BaseNode destination = CreateSourceTree("root dest", 2);
+
+            MyNode<int> feuilleSource = GetFeuille(source, 2);
+            MyNode<int> feuilledest = GetFeuille(destination, 2);
+            destination.Left.Right = null;
+            source.Left.Right = null;
+            DataBinder.AddCompiledBinding(source, "Left.Right.UserData", destination, "Left.Right.UserData");
+
+
+            feuilleSource.UserData = 1235;
+            Assert.AreEqual(0, feuilledest.UserData);
+        }
+
+        [Test(Description = "set reference to null before binding and set to valid reference after binding")]
+        public void Test17()
+        {
+            BaseNode source = CreateSourceTree("root", 2);
+            BaseNode destination = CreateSourceTree("root dest", 2);
+
+            MyNode<int> feuilleSource = GetFeuille(source, 2);
+            MyNode<int> feuilledest = GetFeuille(destination, 2);
+            destination.Left.Right = null;
+            source.Left.Right = null;
+            DataBinder.AddCompiledBinding(source, "Left.Right.UserData", destination, "Left.Right.UserData");
+
+
+            feuilleSource.UserData = 1235;
+            Assert.AreEqual(0, feuilledest.UserData);
+            
+            source.Left.Right = feuilleSource;
+            Assert.AreEqual(0, feuilledest.UserData);
+            destination.Left.Right = feuilledest;
+            Assert.AreEqual(1235, feuilledest.UserData);
+        }
+
+        [Test(Description = "test binding with array as destination")]
+        public void Test18()
+        {
+            BaseNode source = CreateSourceTree("root", 2);
+            MyNode<DataWithBindingList> destination = CreateSourceTreeList("root dest", 2);
+
+            MyNode<int> feuilleSource = GetFeuille(source, 2);
+            feuilleSource.UserData = 789;
+            MyNode<DataWithBindingList> feuilledest = GetFeuille<DataWithBindingList>(destination, 2);
+            feuilledest.UserData.IntList.Add(123);
+            DataBinder.AddCompiledBinding(source, "Left.Right.UserData", destination, "Left.Right.UserData.IntList[0]");
+
+            Assert.AreEqual(789, feuilledest.UserData.IntList[0]);
+
+        }
+
+        [Test(Description = "test binding with an array on source")]
+        public void Test19()
+        {
+            MyNode<DataWithBindingList> source = CreateSourceTreeList("root source", 2);
+            BaseNode destination = CreateSourceTree("root dest", 2);
+
+            MyNode<int> destinationSource = GetFeuille(destination, 2);
+            destinationSource.UserData = 789;
+            MyNode<DataWithBindingList> feuilleSource = GetFeuille<DataWithBindingList>(source, 2);
+            //feuilleSource.UserData.IntList.Add(354);
+            DataBinder.AddCompiledBinding(source, "Left.Right.UserData.IntList[0]", destination, "Left.Right.UserData");
+            feuilleSource.UserData.IntList.Add(354);
+
+            Assert.AreEqual(354, destinationSource.UserData);
+
+            feuilleSource.UserData.IntList.Add(123);
+
+            Assert.AreEqual(354, destinationSource.UserData);
+
+            feuilleSource.UserData.IntList[0] = 789;
+
+            Assert.AreEqual(789, destinationSource.UserData);
+        }
+
+        [Test(Description = "test binding with an array on source, array is already filled")]
+        public void Test20()
+        {
+            MyNode<DataWithBindingList> source = CreateSourceTreeList("root source", 2);
+            BaseNode destination = CreateSourceTree("root dest", 2);
+
+            MyNode<int> destinationSource = GetFeuille(destination, 2);
+            destinationSource.UserData = 789;
+            MyNode<DataWithBindingList> feuilleSource = GetFeuille<DataWithBindingList>(source, 2);
+            feuilleSource.UserData.IntList.Add(354);
+
+            DataBinder.AddCompiledBinding(source, "Left.Right.UserData.IntList[0]", destination, "Left.Right.UserData");
+
+            Assert.AreEqual(354, destinationSource.UserData);
+        }
+
+        [Test(Description = "test binding with an array on source, replace instance of array with another, check that old array is disposed")]
+        public void Test21()
+        {
+            bool listfinalized = false;
+            MyNode<DataWithBindingList> source = CreateSourceTreeList("root source", 2);
+            BaseNode destination = CreateSourceTree("root dest", 2);
+
+            MyNode<int> destinationSource = GetFeuille(destination, 2);
+            destinationSource.UserData = 789;
+            MyNode<DataWithBindingList> feuilleSource = GetFeuille<DataWithBindingList>(source, 2);
+            feuilleSource.UserData.MyIntList.OnFinalized += delegate
+            {
+                listfinalized = true;
+            };
+            feuilleSource.UserData.MyIntList.Add(354);
+
+            DataBinder.AddCompiledBinding(source, "Left.Right.UserData.MyIntList[0]", destination, "Left.Right.UserData");
+
+            Assert.AreEqual(354, destinationSource.UserData);
+            feuilleSource.UserData.MyIntList = new MyBindingList();
+            feuilleSource.UserData.MyIntList.Add(555);
+            Assert.AreEqual(555, destinationSource.UserData);
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            //checks that Array is really finalized
+            Assert.IsTrue(listfinalized);
+        }
+
         //[Test(Description = "")]
-        //public void Test14()
+        //public void Test22()
         //{
         //}
         //[Test(Description = "")]
-        //public void Test15()
-        //{
-        //}
-        //[Test(Description = "")]
-        //public void Test16()
-        //{
-        //}
-        //[Test(Description = "")]
-        //public void Test17()
-        //{
-        //}
-        //[Test(Description = "")]
-        //public void Test18()
-        //{
-        //}
-        //[Test(Description = "")]
-        //public void Test19()
-        //{
-        //}
-        //[Test(Description = "")]
-        //public void Test20()
+        //public void Test23()
         //{
         //}
     }

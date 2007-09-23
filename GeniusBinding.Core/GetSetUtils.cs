@@ -22,7 +22,10 @@ namespace GeniusBinding.Core
     public delegate void SetHandlerDelegate<TValue>(object destination, TValue value);
 
 
-    class GetSetUtils
+    /// <summary>
+    /// classe utilitaire pour la création de "handlers" sur les "GET/SET" des propriétés
+    /// </summary>
+    public class GetSetUtils
     {
         /// <summary>
         /// cache pour les méthodes dynamiques créées
@@ -35,7 +38,7 @@ namespace GeniusBinding.Core
         /// <typeparam name="TInstance"></typeparam>
         /// <param name="propertyInfo"></param>
         /// <returns></returns>
-        internal static GetHandlerDelegate<TValue> CreateGetHandler<TValue>(PropertyInfo propertyInfo)
+        public static GetHandlerDelegate<TValue> CreateGetHandler<TValue>(PropertyInfo propertyInfo)
         {
             MethodInfo getMethod = propertyInfo.GetGetMethod(true);
             if (_Dico.ContainsKey(getMethod))
@@ -66,7 +69,7 @@ namespace GeniusBinding.Core
         /// <typeparam name="TInstance">type contenant la propriété</typeparam>
         /// <param name="propertyInfo">propertyInfo de la propriété concernée</param>
         /// <returns></returns>
-        internal static SetHandlerDelegate<TValue> CreateSetHandler<TValue>(PropertyInfo propertyInfo)
+        public static SetHandlerDelegate<TValue> CreateSetHandler<TValue>(PropertyInfo propertyInfo)
         {
             MethodInfo setMethod = propertyInfo.GetSetMethod(true);
             if (_Dico.ContainsKey(setMethod))
