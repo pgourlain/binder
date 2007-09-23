@@ -15,14 +15,32 @@ namespace TestMyBinding
         static void Main(string[] args)
         {
             //TestSimplebinding();
-            //TestBidirectinnelbinding();
+            //TestBidirectionnelbinding();
             //TestBidirectinnelbindingAndunreferenced();
             //TestSimplebindingWithconverter();
             ////TestRecursiveBinding();
             //TestPropertyPathBinding();
-            TestException();
+            //TestException();
+            //TestArrayIndexerBinding();
+            TestCompiled_vs_Reflection();
             Console.WriteLine("Enter to exit...");
             Console.ReadLine();
+        }
+
+        private static void TestArrayIndexerBinding()
+        {
+            HierarchicalData source = new HierarchicalData();
+            HierarchicalData destination = new HierarchicalData();
+            destination.A.B.C = null;
+
+            DataBinder.AddCompiledBinding(source, "A.B.C.List[0].Prop2", destination, "A.B.C.Prop1");
+            SourceOfData1 data1 = new SourceOfData1();
+            data1.Prop2 = 456;
+            source.A.B.C.List.Add(data1);
+            data1.Prop2 = 789;
+
+            destination.A.B.C = new SourceOfData();
+
         }
 
         private static void TestException()
@@ -42,9 +60,10 @@ namespace TestMyBinding
             AreEqual(25, destination.A.B.C.Prop1, "binding doesn't work !");
             HierarchicalDataA oldA = source.A;
 
+            //ici la destination va reprendre la valeur de la source, donc  0
             source.A = new HierarchicalDataA("test");
             oldA.B.C.Prop1 = 123;
-            AreEqual(25, destination.A.B.C.Prop1, "binding doesn't work !");
+            AreEqual(0, destination.A.B.C.Prop1, "binding doesn't work !");
             source.A.B.C.Prop1 = 456;
             AreEqual(456, destination.A.B.C.Prop1, "binding doesn't work !");
             source.A = new HierarchicalDataA("test1");
@@ -170,9 +189,9 @@ namespace TestMyBinding
             s.Prop1 = 123;
         }
 
-        private static void TestBidirectinnelbinding()
+        private static void TestBidirectionnelbinding()
         {
-            Console.WriteLine("TestBidirectinnelbinding");
+            Console.WriteLine("TestBidirectionnelbinding");
             DestinationOfData d = new DestinationOfData();
             SourceOfData s = new SourceOfData();
 
@@ -204,5 +223,80 @@ namespace TestMyBinding
         {
             Console.WriteLine("source Prop1 :" + s.Prop1);
         }
+
+        #region performance test
+        private static void TestCompiled_vs_Reflection()
+        {
+            long msReflection = TestReflection();
+            long msCompiled = TestCompiled();
+
+            Console.WriteLine(string.Format("reflection :{0}, compiled : {1}", msReflection, msCompiled));
+            double rapport = (double)msReflection / (double)msCompiled;
+            Console.WriteLine(string.Format("Compiled method is {0} times faster than reflection method", rapport));
+        }
+
+        class DataTestForPerf : INotifyPropertyChanged
+        {
+            private int _intProp;
+            public int Prop1 {
+                get { return _intProp; }
+                set { _intProp = value; 
+                    if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("Prop1")); 
+                }
+            }
+            public event PropertyChangedEventHandler PropertyChanged;
+        }
+
+        static int NBTURNS = 100000;
+
+        private static long TestCompiled()
+        {
+            DataTestForPerf src = new DataTestForPerf();
+            DataTestForPerf dst = new DataTestForPerf();
+            
+            PropertyInfo piSource = src.GetType().GetProperty("Prop1");
+            PropertyInfo piDest = dst.GetType().GetProperty("Prop1");
+
+            GetHandlerDelegate<int> getSrc = GetSetUtils.CreateGetHandler<int>(piSource);
+            SetHandlerDelegate<int> setDst = GetSetUtils.CreateSetHandler<int>(piDest);
+
+            src.PropertyChanged += delegate
+            {
+                setDst(dst, getSrc(src));
+            };
+
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            for (int i = 1; i <= NBTURNS; i++)
+            {
+                src.Prop1 = i;
+            }
+            watch.Stop();
+            return watch.ElapsedMilliseconds;
+        }
+
+        private static long TestReflection()
+        {
+            DataTestForPerf src = new DataTestForPerf();
+            DataTestForPerf dst = new DataTestForPerf();
+
+            PropertyDescriptor pdSource = TypeDescriptor.GetProperties(src)["Prop1"];
+            PropertyDescriptor pdDest = TypeDescriptor.GetProperties(dst)["Prop1"];
+            src.PropertyChanged += delegate
+            {
+                pdDest.SetValue(dst, pdSource.GetValue(src));
+            };
+
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            for (int i = 1; i <= NBTURNS; i++)
+            {
+                src.Prop1 = i;
+            }
+            watch.Stop();
+            return watch.ElapsedMilliseconds;
+        }
+        #endregion
     }
 }

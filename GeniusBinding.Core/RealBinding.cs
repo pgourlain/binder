@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
+using System.Collections;
+using System.Diagnostics;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace GeniusBinding.Core
 {
@@ -13,6 +17,7 @@ namespace GeniusBinding.Core
         void Bind(object source, PropertyInfo piSource, object destination, PropertyInfo piDest, IBinderConverter converter);
         void UnBind();
         void SetDestination(object destination);
+        void ForceUpdate();
     }
 
     /// <summary>
@@ -26,6 +31,7 @@ namespace GeniusBinding.Core
         WeakReference weakDst;
         SetHandlerDelegate<TValueSource> sethandler;
         SetHandlerDelegate<TValueDest> sethandlerDest;
+        GetHandlerDelegate<TValueSource> gethandler;
         private string _PropNameSource;
         IBinderConverter _Converter;
         OnChangeDelegate<TValueSource> _CurrentChanged;
@@ -37,7 +43,7 @@ namespace GeniusBinding.Core
             _Converter = converter;
             _PropNameSource = piSource.Name;
 
-            GetHandlerDelegate<TValueSource> gethandler = GetSetUtils.CreateGetHandler<TValueSource>(piSource);
+            gethandler = GetSetUtils.CreateGetHandler<TValueSource>(piSource);
 
             //le set handler devrait être sur le type destination
 
@@ -86,6 +92,134 @@ namespace GeniusBinding.Core
         {
             weakDst.Target = destination;
         }
+
+        public void ForceUpdate()
+        {
+            if (weakSrc.IsAlive && weakDst.IsAlive && weakDst.Target != null)
+            {
+                _CurrentChanged(gethandler(weakSrc.Target));
+            }
+        }
     }
 
+    abstract class CollectionWrapper<T, TIndex>
+    {
+        TIndex _Index;
+
+        public CollectionWrapper(TIndex index)
+        {
+            _Index = index;
+        }
+
+        protected TIndex Index
+        {
+            get
+            {
+                return _Index;
+            }
+        }
+
+        public abstract T ArrayValue { get; set;}
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T">typeof item at the specified index</typeparam>
+    class ArrayWrapper<T> : CollectionWrapper<T, int>, IDisposable
+    {
+        WeakReference _list;
+        WeakReference _originalCollection;
+        IList<T> _TypedList;
+        IList _UnTypedcollection;
+        //object _originalCollection;
+        CollectionChangedDelegate _onCollectionChanged;
+
+        public ArrayWrapper(object collection, int index, CollectionChangedDelegate onCollectionChanged) : base (index)
+        {
+            Check.IsNotNull("collection", collection);
+            _UnTypedcollection = collection as IList;
+            _TypedList = collection as IList<T>;           
+            if (_UnTypedcollection == null && _TypedList == null)
+                throw new Exception("unknown collection : " + collection.GetType().ToString());
+            _onCollectionChanged = onCollectionChanged;
+            if (collection is ICollectionChanged)
+            {
+                ((ICollectionChanged)collection).CollectionChanged += new EventHandler<CollectionChangedEventArgs>(ArrayWrapper_CollectionChanged);
+            }
+            else if (collection is IBindingList)
+            {
+                ((IBindingList)collection).ListChanged += new ListChangedEventHandler(ArrayWrapper_ListChanged);
+            }
+            _originalCollection = new WeakReference(collection);
+            //_originalCollection = collection;
+        }
+
+        void ArrayWrapper_CollectionChanged(object sender, CollectionChangedEventArgs e)
+        {
+            if (e.NewIndex == Index || e.OldIndex == Index)
+            {
+                if (_onCollectionChanged != null)
+                {
+                    _onCollectionChanged();
+                }
+            }
+        }
+
+        void ArrayWrapper_ListChanged(object sender, ListChangedEventArgs e)
+        {
+            if (e.NewIndex == Index || e.OldIndex == Index)
+            {
+                if (_onCollectionChanged != null)
+                {
+                    _onCollectionChanged();
+                }
+            }
+        }
+
+        public override T ArrayValue
+        {
+            get
+            {
+                if (_TypedList != null)
+                {
+                    return _TypedList[Index];
+                }
+                return (T)_UnTypedcollection[Index];
+            }
+            set
+            {
+                if (_TypedList != null)
+                {
+                    _TypedList[Index] = value;
+                }
+                else
+                    _UnTypedcollection[Index] = value;
+            }
+        }
+
+        ~ArrayWrapper()
+        {
+            Debug.WriteLine("~ArrayWrapper()");
+        }
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            if (_originalCollection != null && _originalCollection.IsAlive)
+            {
+                if (_originalCollection.Target is ICollectionChanged)
+                {
+                    ((ICollectionChanged)_originalCollection.Target).CollectionChanged -= ArrayWrapper_CollectionChanged;
+                }
+                else if (_originalCollection is IBindingList)
+                {
+                    ((IBindingList)_originalCollection.Target).ListChanged -= new ListChangedEventHandler(ArrayWrapper_ListChanged);
+                }
+            }
+        }
+
+        #endregion
+    }
 }
