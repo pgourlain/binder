@@ -14,5 +14,7 @@ namespace GeniusBinding.Core
         bool Enabled { get; set;}
 
         Delegate OnChanged { get; set;}
+
+        EventHandler PropertyChangedEvent { get; }
     }
 }

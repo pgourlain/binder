@@ -5,11 +5,21 @@ using System.ComponentModel;
 using System.Reflection.Emit;
 using System.Reflection;
 using System.Collections.ObjectModel;
+using System.Threading;
 
 namespace GeniusBinding.Core
 {
     /// <summary>
-    /// deleguée utiliseée, pour réaliser un "OnChanged" avec la nouvelle valeur
+    /// Used by <see cref="DataBinder.CreateConverter"/> to converter a delegate to <see cref="IBinderConverter"/>
+    /// </summary>
+    /// <typeparam name="TResult">type of result conversion</typeparam>
+    /// <typeparam name="TValue">type of value to convert</typeparam>
+    /// <param name="value">value to convert</param>
+    /// <returns>the converted value</returns>
+    public delegate TResult BinderConverterDelegate<TResult, TValue>(TValue value);
+
+    /// <summary>
+    /// deleguée utilisée, pour réaliser un "OnChanged" avec la nouvelle valeur
     /// </summary>
     /// <typeparam name="TValue"></typeparam>
     /// <param name="value"></param>
@@ -27,8 +37,17 @@ namespace GeniusBinding.Core
             private bool _HasCalled;
             GetHandlerDelegate<T> _OnGet;
             public OnChangeDelegate<T> _OnChanged;
+            /// <summary>
+            /// name of 'listen' property 
+            /// </summary>
             public string PropertyName = string.Empty;
             private bool _BindingEnabled = true;
+            /// <summary>
+            /// handler when event "PropertyName"Changed exists
+            /// </summary>
+            public EventHandler _PropertyChangedEvent;
+
+            public SynchronizationContext _ApplyBindingContext;
 
             public OneNotify(GetHandlerDelegate<T> getter, OnChangeDelegate<T> onchanged)
             {
@@ -46,13 +65,35 @@ namespace GeniusBinding.Core
                     _HasCalled = true;
                     try
                     {
-                        _OnChanged(_OnGet(weak.Target));
+                        
+                        if (_ApplyBindingContext != null)
+                        {
+                            _ApplyBindingContext.Send(DoNotifyValueChanged, weak.Target);
+                        }
+                        else
+                        {
+                            DoNotifyValueChanged(weak.Target);
+                        }
                     }
                     finally
                     {
                         _HasCalled = false;
                     }
                 }
+            }
+
+            private void DoNotifyValueChanged(object target)
+            {
+                T Value;
+                try
+                {
+                    Value = _OnGet(target);
+                }
+                catch (Exception ex)
+                {
+                    throw new CompiledBindingException(string.Format("Get value on property '{0}' failed", PropertyName), ex);
+                }
+                _OnChanged(Value);
             }
 
             public bool Enabled
@@ -79,8 +120,16 @@ namespace GeniusBinding.Core
                     _OnChanged = (OnChangeDelegate<T>)value;
                 }
             }
+            public EventHandler PropertyChangedEvent
+            {
+                get
+                {
+                    return _PropertyChangedEvent;
+                }
+            } 
             #endregion
         }
+
         #endregion
 
         /// <summary>
@@ -115,7 +164,7 @@ namespace GeniusBinding.Core
         /// <param name="propName">property à observer</param>
         /// <param name="gethandler">"get" a appeler a chaque changements</param>
         /// <param name="OnValueChange">la déléguée à appelée après chaque changed de la source</param>
-        internal static void AddNotify<T>(object source, string propName, GetHandlerDelegate<T> gethandler, OnChangeDelegate<T> OnValueChange)
+        internal static void AddNotify<T>(object source, string propName, GetHandlerDelegate<T> gethandler, OnChangeDelegate<T> OnValueChange, SynchronizationContext applyBindingContext)
         {
             INotifyPropertyChanged inotify = source as INotifyPropertyChanged;
             if (inotify != null)
@@ -123,11 +172,7 @@ namespace GeniusBinding.Core
                 WeakReference weak = new EqualityWeakReference(inotify);
                 //le but est ici de ne s'abonner qu'une fois
                 Dictionary<string, IOneNotify> dico = null;
-                if (_SourceChanged.ContainsKey(weak))
-                {
-                    dico = _SourceChanged[weak];
-                }
-                else
+                if (!_SourceChanged.TryGetValue(weak, out dico))
                 {
                     dico = new Dictionary<string, IOneNotify>();
                     _SourceChanged.Add(weak, dico);
@@ -148,8 +193,46 @@ namespace GeniusBinding.Core
                 else
                 {
                     binding = new OneNotify<T>(gethandler, OnValueChange);
+                    binding._ApplyBindingContext = applyBindingContext;
                     binding.PropertyName = propName;
                     dico[propName] = binding;
+                }
+            }
+            else if (source != null)
+            {
+                //try with old mode "PropertyName"Changed event
+                string eventName = string.Format("{0}Changed", propName);
+                EventInfo evInfo = source.GetType().GetEvent(eventName);
+                if (evInfo != null)
+                {
+                    WeakReference weak = new EqualityWeakReference(source);
+                    //le but est ici de ne s'abonner qu'une fois
+                    Dictionary<string, IOneNotify> dico = null;
+                    if (!_SourceChanged.TryGetValue(weak, out dico))
+                    {
+                        dico = new Dictionary<string, IOneNotify>();
+                        _SourceChanged.Add(weak, dico);
+                    }
+
+                    ///plusieurs abonnement si nécessaire pour une propriété binding de 1 prop vers plusieurs dest
+                    OneNotify<T> binding = null;
+                    if (dico.ContainsKey(propName))
+                    {
+                        binding = (OneNotify<T>)dico[propName];
+                        binding._OnChanged = (OnChangeDelegate<T>)Delegate.Combine(binding._OnChanged, OnValueChange);
+                    }
+                    else
+                    {
+                        binding = new OneNotify<T>(gethandler, OnValueChange);
+                        binding.PropertyName = propName;
+                        binding._ApplyBindingContext = applyBindingContext;
+                        binding._PropertyChangedEvent = delegate
+                        {
+                            binding.Fire(weak);
+                        };
+                        dico[propName] = binding;
+                        evInfo.AddEventHandler(source, binding._PropertyChangedEvent);
+                    }
                 }
             }
         }
@@ -162,14 +245,37 @@ namespace GeniusBinding.Core
                 WeakReference weak = new EqualityWeakReference(inotify);
                 //le but est ici de ne s'abonner qu'une fois
                 Dictionary<string, IOneNotify> dico = null;
-                if (_SourceChanged.ContainsKey(weak))
+                if (_SourceChanged.TryGetValue(weak, out dico))
                 {
-                    dico = _SourceChanged[weak];
                     if (dico.ContainsKey(propName))
                     {
                         dico[propName].OnChanged = Delegate.Remove(dico[propName].OnChanged, del);
                         if (dico[propName].OnChanged == null)
                             dico.Remove(propName);
+                    }
+                }
+            }
+            else if (source != null)
+            {
+                //try with old mode "PropertyName"Changed event
+                string eventName = string.Format("{0}Changed", propName);
+                EventInfo evInfo = source.GetType().GetEvent(eventName);
+                if (evInfo != null)
+                {
+                    WeakReference weak = new EqualityWeakReference(source);
+                    //le but est ici de ne s'abonner qu'une fois
+                    Dictionary<string, IOneNotify> dico = null;
+                    if (_SourceChanged.TryGetValue(weak, out dico))
+                    {
+                        if (dico.ContainsKey(propName))
+                        {
+                            dico[propName].OnChanged = Delegate.Remove(dico[propName].OnChanged, del);
+                            if (dico[propName].OnChanged == null)
+                            {
+                                evInfo.RemoveEventHandler(source, dico[propName].PropertyChangedEvent);
+                                dico.Remove(propName);
+                            }
+                        }
                     }
                 }
             }
@@ -191,10 +297,22 @@ namespace GeniusBinding.Core
             string[] pathItems = propertypath.Split('.');
 
             
-            PropertyPathBindingItem item = new PropertyPathBindingItem(source, propertypath, destination, destPropertypath, null);
+            PropertyPathBindingItem item = new PropertyPathBindingItem(source, propertypath, destination, destPropertypath, null, null);
             _Bindings.Add(item);
         }
 
+        public static void AddCompiledBinding(object source, string propertypath, object destination, string destPropertypath, SynchronizationContext applyBindingContext)
+        {
+            Check.IsNotNull("source", source);
+            Check.IsNotNull("propertypath", propertypath);
+            Check.IsNotNull("destination", destination);
+            Check.IsNotNull("destPropertypath", destPropertypath);
+            string[] pathItems = propertypath.Split('.');
+
+
+            PropertyPathBindingItem item = new PropertyPathBindingItem(source, propertypath, destination, destPropertypath, null, applyBindingContext);
+            _Bindings.Add(item);
+        }
         /// <summary>
         /// ajoute un binding
         /// </summary>
@@ -212,10 +330,24 @@ namespace GeniusBinding.Core
             string[] pathItems = propertypath.Split('.');
 
 
-            PropertyPathBindingItem item = new PropertyPathBindingItem(source, propertypath, destination, destPropertypath, converter);
+            PropertyPathBindingItem item = new PropertyPathBindingItem(source, propertypath, destination, destPropertypath, converter, null);
             _Bindings.Add(item);
         }
 
+
+        public static void AddCompiledBinding(object source, string propertypath, object destination, string destPropertypath, SynchronizationContext applyBindingContext, IBinderConverter converter)
+        {
+            Check.IsNotNull("source", source);
+            Check.IsNotNull("propertypath", propertypath);
+            Check.IsNotNull("destination", destination);
+            Check.IsNotNull("destPropertypath", destPropertypath);
+            string[] pathItems = propertypath.Split('.');
+
+
+            PropertyPathBindingItem item = new PropertyPathBindingItem(source, propertypath, destination, destPropertypath, converter, applyBindingContext);
+            _Bindings.Add(item);
+        }        
+      
         /// <summary>
         /// enlève un binding
         /// </summary>
@@ -271,6 +403,18 @@ namespace GeniusBinding.Core
             {
                 return new ReadOnlyCollection<IPropertyPathBinding>(_Bindings);
             }
+        }
+
+        /// <summary>
+        /// Creates a converter around a delegate, that can be used in <see cref="AddCompiledBinding"/> method
+        /// </summary>
+        /// <typeparam name="TResult">type of conversion result</typeparam>
+        /// <typeparam name="TValue">typeo of  value to convert</typeparam>
+        /// <param name="converterDelegate">delegate that implements the conversion</param>
+        /// <returns>an object, that wrap delegate</returns>
+        public static IBinderConverter CreateConverter<TResult, TValue>(BinderConverterDelegate<TResult, TValue> converterDelegate)
+        {
+            return new BinderConverterDelegateWrapper<TResult, TValue>(converterDelegate);
         }
         #endregion
     }

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace GeniusBinding.Core.Tests
 {
@@ -461,13 +463,148 @@ namespace GeniusBinding.Core.Tests
             Assert.IsTrue(listfinalized);
         }
 
-        //[Test(Description = "")]
-        //public void Test22()
-        //{
-        //}
-        //[Test(Description = "")]
-        //public void Test23()
-        //{
-        //}
+        class SourceDataThrowException : BaseData
+        {
+            int _PropGetThrowException;
+            public int PropGetThrowException
+            {
+                get
+                {
+                    throw new NotImplementedException("PropGetThrowException");
+                }
+                set
+                {
+                    if (_PropGetThrowException != value)
+                    {
+                        _PropGetThrowException = value;
+                        DoPropertyChanged("PropGetThrowException");
+                    }
+                }
+            }
+        }
+
+        [Test(Description = "Test exception on get")]
+        [ExpectedException(typeof(CompiledBindingException))]
+        public void Test22()
+        {
+            SourceDataThrowException source = new SourceDataThrowException();
+            SourceOfData destination = new SourceOfData();
+
+            DataBinder.AddCompiledBinding(source, "PropGetThrowException", destination, "Prop1");
+        }
+
+        class SourceDataNotifyOnPropertyChanged
+        {
+            public event EventHandler IntPropertyChanged;
+            int _IntProperty;
+            public int IntProperty
+            {
+                get
+                {
+                    return _IntProperty;
+                }
+                set
+                {
+                    if (_IntProperty != value)
+                    {
+                        _IntProperty = value;
+                        if (IntPropertyChanged != null)
+                            IntPropertyChanged(this, EventArgs.Empty);
+                    }
+                }
+            }
+        }
+
+        [Test(Description = "test notification by 'PropertyName'Changed event")]
+        public void Test23()
+        {
+            SourceDataNotifyOnPropertyChanged source = new SourceDataNotifyOnPropertyChanged();
+            source.IntProperty = 123456;
+            SourceOfData destination = new SourceOfData();
+
+            DataBinder.AddCompiledBinding(source, "IntProperty", destination, "Prop1");
+            Assert.AreEqual(123456, destination.Prop1);
+            source.IntProperty = 456789;
+            Assert.AreEqual(456789, destination.Prop1);
+        }
+
+        class DataToTestSynchronizationContext : BaseData
+        {
+            int _IntProperty;
+            public int IntProperty
+            {
+                get
+                {
+                    if (OnGet != null)
+                        OnGet(this, EventArgs.Empty);
+                    return _IntProperty;
+                }
+                set
+                {
+                    if (_IntProperty != value)
+                    {
+                        if (OnSet != null)
+                            OnSet(this, EventArgs.Empty);
+                        _IntProperty = value;
+                        DoPropertyChanged("IntProperty");
+                    }
+                }
+            }
+
+            public event EventHandler OnGet;
+            public event EventHandler OnSet;
+        }
+
+        [Test(Description = "test binding with synchronization context")]
+        public void Test24()
+        {
+            int currentThId = -1;
+            int getThId = 0, setThId = 0;
+            ManualResetEvent waitevent = new ManualResetEvent(false);
+            DataToTestSynchronizationContext source = new DataToTestSynchronizationContext();
+            source.IntProperty = 123456;
+            DataToTestSynchronizationContext destination = new DataToTestSynchronizationContext();
+
+            new Thread((ThreadStart)delegate
+            {
+                //Create a synchronizationcontext
+                Button b = new Button();
+                bool propHasSet = false;
+                currentThId = Thread.CurrentThread.ManagedThreadId;
+                ExecutionContext exCtx = Thread.CurrentThread.ExecutionContext;
+
+                DataBinder.AddCompiledBinding(source, "IntProperty", destination, "IntProperty", SynchronizationContext.Current);
+                Assert.AreEqual(123456, destination.IntProperty);
+
+                source.OnGet += delegate
+                {
+                    getThId = Thread.CurrentThread.ManagedThreadId;
+                };
+
+                destination.OnSet += delegate
+                {
+                    setThId = Thread.CurrentThread.ManagedThreadId;
+                    propHasSet = true;
+                };
+
+                Thread th = new Thread((ThreadStart)delegate
+                {
+                    source.IntProperty = 456789;
+
+                });
+                th.Start();
+                while (!propHasSet)
+                {
+                    Application.DoEvents();
+                }
+                waitevent.Set();
+            }).Start();
+            waitevent.WaitOne();
+            Assert.AreEqual(456789, destination.IntProperty);
+            Assert.AreEqual(currentThId, getThId);
+            Assert.AreEqual(currentThId, setThId);
+
+        }
+
     }
 }

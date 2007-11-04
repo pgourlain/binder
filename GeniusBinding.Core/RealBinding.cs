@@ -6,6 +6,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Threading;
 
 namespace GeniusBinding.Core
 {
@@ -14,7 +15,7 @@ namespace GeniusBinding.Core
     /// </summary>
     interface IRealBinding
     {
-        void Bind(object source, PropertyInfo piSource, object destination, PropertyInfo piDest, IBinderConverter converter);
+        void Bind(object source, PropertyInfo piSource, object destination, PropertyInfo piDest, IBinderConverter converter, SynchronizationContext applyBindingContext);
         void UnBind();
         void SetDestination(object destination);
         void ForceUpdate();
@@ -33,16 +34,20 @@ namespace GeniusBinding.Core
         SetHandlerDelegate<TValueDest> sethandlerDest;
         GetHandlerDelegate<TValueSource> gethandler;
         private string _PropNameSource;
+        private string _PropNameDest;
         IBinderConverter _Converter;
         OnChangeDelegate<TValueSource> _CurrentChanged;
 
-        public void Bind(object source, PropertyInfo piSource, object destination, PropertyInfo piDest, IBinderConverter converter)
+        public void Bind(object source, PropertyInfo piSource, object destination, 
+            PropertyInfo piDest, 
+            IBinderConverter converter, 
+            SynchronizationContext applyBindingContext)
         {
             weakSrc = new WeakReference(source);
             weakDst = new WeakReference(destination);
             _Converter = converter;
             _PropNameSource = piSource.Name;
-
+            _PropNameDest = piDest.Name;
             gethandler = GetSetUtils.CreateGetHandler<TValueSource>(piSource);
 
             //le set handler devrait être sur le type destination
@@ -58,14 +63,21 @@ namespace GeniusBinding.Core
                 sethandler = GetSetUtils.CreateSetHandler<TValueSource>(piDest);
             }
 
-            DataBinder.AddNotify<TValueSource>(source, piSource.Name, gethandler, _CurrentChanged);
+            DataBinder.AddNotify<TValueSource>(source, piSource.Name, gethandler, _CurrentChanged, applyBindingContext);
         }
 
         void OnValueChanged(TValueSource value)
         {
             if (weakDst != null && weakDst.IsAlive)
             {
-                sethandler(weakDst.Target, value);
+                try
+                {
+                    sethandler(weakDst.Target, value);
+                }
+                catch (Exception ex)
+                {
+                    throw new CompiledBindingException(string.Format("Set value on property '{0}' failed", _PropNameDest), ex);
+                }
             }
         }
 
@@ -78,7 +90,14 @@ namespace GeniusBinding.Core
                     IBinderConverter<TValueDest, TValueSource> cv = _Converter as IBinderConverter<TValueDest, TValueSource>;
                     if (cv == null)
                         throw new Exception(string.Format("converter must implement 'IBinderConverter<{0},{1}>'", typeof(TValueDest), typeof(TValueSource)));
-                    sethandlerDest(weakDst.Target, cv.Convert(value));
+                    try
+                    {
+                        sethandlerDest(weakDst.Target, cv.Convert(value));
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new CompiledBindingException(string.Format("Set value on property '{0}' failed", _PropNameDest), ex);
+                    }
                 }
             }
         }
@@ -95,9 +114,18 @@ namespace GeniusBinding.Core
 
         public void ForceUpdate()
         {
+            TValueSource value;
             if (weakSrc.IsAlive && weakDst.IsAlive && weakDst.Target != null)
             {
-                _CurrentChanged(gethandler(weakSrc.Target));
+                try
+                {
+                    value = gethandler(weakSrc.Target);
+                }
+                catch (Exception ex)
+                {
+                    throw new CompiledBindingException(string.Format("Get value on property '{0}' failed", _PropNameSource), ex);
+                }
+                _CurrentChanged(value);
             }
         }
     }
@@ -128,7 +156,6 @@ namespace GeniusBinding.Core
     /// <typeparam name="T">typeof item at the specified index</typeparam>
     class ArrayWrapper<T> : CollectionWrapper<T, int>, IDisposable
     {
-        WeakReference _list;
         WeakReference _originalCollection;
         IList<T> _TypedList;
         IList _UnTypedcollection;

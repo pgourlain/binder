@@ -7,6 +7,7 @@ using System.Drawing;
 using System.ComponentModel;
 using System.Reflection.Emit;
 using System.Reflection;
+using TestMyBinding.BindingWithForms;
 
 namespace TestMyBinding
 {
@@ -22,9 +23,16 @@ namespace TestMyBinding
             //TestPropertyPathBinding();
             //TestException();
             //TestArrayIndexerBinding();
-            TestCompiled_vs_Reflection();
+            //TestCompiled_vs_Reflection();
+            TestCompiledBinding_Forms();
             Console.WriteLine("Enter to exit...");
             Console.ReadLine();
+        }
+
+        private static void TestCompiledBinding_Forms()
+        {
+            TestCompiledBindingInForms dlg = new TestCompiledBindingInForms();
+            dlg.ShowDialog();
         }
 
         private static void TestArrayIndexerBinding()

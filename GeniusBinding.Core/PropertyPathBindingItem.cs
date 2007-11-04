@@ -5,6 +5,7 @@ using System.Reflection;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Collections;
+using System.Threading;
 
 namespace GeniusBinding.Core
 {
@@ -25,6 +26,8 @@ namespace GeniusBinding.Core
         OnePropertyPathBinding _SourceBinding;
         OnePropertyPathBinding _DestinationBinding;
 
+        SynchronizationContext _ApplyBindingContext;
+
         /// <summary>
         /// constructeur par défaut
         /// </summary>
@@ -33,8 +36,12 @@ namespace GeniusBinding.Core
         /// <param name="destination"></param>
         /// <param name="propertyPathdest"></param>
         /// <param name="converter"></param>
-        public PropertyPathBindingItem(object sourceTarget, string propertyPath, object destinationTarget, string propertyPathdest, IBinderConverter converter)
+        public PropertyPathBindingItem(object sourceTarget, string propertyPath, 
+                                        object destinationTarget, string propertyPathdest, 
+                                        IBinderConverter converter, 
+                                        SynchronizationContext applyBindingContext)
         {
+            _ApplyBindingContext = applyBindingContext;
             _Converter = converter;
             _DestinationBinding = new OnePropertyPathBinding();
             _SourceBinding = new OnePropertyPathBinding();
@@ -42,6 +49,7 @@ namespace GeniusBinding.Core
             _DestinationBinding.Bind(destinationTarget, propertyPathdest,
                 delegate(int currentIndex, EqualityWeakReference weakSource)
                 {
+                    //this delegate it's  : "What to do when an intermediate property changing"
                     return delegate(object value)
                     {
                         if (weakSource.IsAlive)
@@ -71,9 +79,11 @@ namespace GeniusBinding.Core
                 //}
             );
 
+            ///Connect to the source
             _SourceBinding.Bind(sourceTarget, propertyPath,
                 delegate(int currentIndex, EqualityWeakReference weakSource)
                 {
+                    //this delegate it's  : "What to do when an intermediate property changing"
                     return delegate(object value)
                     {
                         if (weakSource.IsAlive)
@@ -84,12 +94,16 @@ namespace GeniusBinding.Core
                         }
                     };
                 },
+                //this delegate it's  : "What to do when the final property changing"
                 delegate(int index, PropertyInfo pi, object src)
                 {
                     RecreateRealBinding();
                 });
         }
 
+        /// <summary>
+        /// Recreate the link between final source property and final destination property
+        /// </summary>
         private void RecreateRealBinding()
         {
             if (_CurrentBinding != null)
@@ -111,6 +125,7 @@ namespace GeniusBinding.Core
             source = srcPathItem.Source.Target;
             destination = destPathItem.Source.Target;
             bool arrayWrapperIsValid;
+            //special case if it's an array
             if (srcPathItem.IsArray)
             {
                 piSource = null;
@@ -151,7 +166,7 @@ namespace GeniusBinding.Core
             Type t = typeof(RealBinding<,>);
             Type realBindingType = t.MakeGenericType(piSource.PropertyType, piDestination.PropertyType);
             _CurrentBinding = (IRealBinding)Activator.CreateInstance(realBindingType);
-            _CurrentBinding.Bind(source, piSource, destination, piDestination, _Converter);
+            _CurrentBinding.Bind(source, piSource, destination, piDestination, _Converter, _ApplyBindingContext);
             _CurrentBinding.ForceUpdate();
         }
 

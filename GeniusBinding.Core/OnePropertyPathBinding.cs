@@ -88,6 +88,13 @@ namespace GeniusBinding.Core
         {
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rootSource"></param>
+        /// <param name="fullpath"></param>
+        /// <param name="factory"></param>
+        /// <param name="OnfinalBind"></param>
         public void Bind(object rootSource, string fullpath, OnChangeDelegateFactoryDelegate factory, OnBindLastItem OnfinalBind)
         {
             _Items = new List<PathItem>();
@@ -285,7 +292,7 @@ namespace GeniusBinding.Core
             PropertyInfo pi = current.GetType().GetProperty(pathitem);
 
             GetHandlerDelegate<object> gethandler = GetSetUtils.CreateGetHandler<object>(pi);
-            DataBinder.AddNotify<object>(current, pathitem, gethandler, onchanged);
+            DataBinder.AddNotify<object>(current, pathitem, gethandler, onchanged, null);
         }
 
     }
