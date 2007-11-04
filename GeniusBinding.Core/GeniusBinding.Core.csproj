@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArrayUtil.cs" />
+    <Compile Include="BinderConverterDelegateWrapper.cs" />
     <Compile Include="BindingListNotificationWrapper.cs" />
     <Compile Include="Check.cs" />
     <Compile Include="CompiledBindingException.cs" />

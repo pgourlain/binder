@@ -4,6 +4,9 @@ using System.Text;
 
 namespace GeniusBinding.Core
 {
+    /// <summary>
+    /// Represents an item in BindingPath
+    /// </summary>
     class PathItem
     {
 
@@ -44,6 +47,9 @@ namespace GeniusBinding.Core
         public bool IsArray;
         public int ArrayIndex;
         object _ArrayWrapper;
+        /// <summary>
+        /// 
+        /// </summary>
         public object ArrayWrapper
         {           
             get
