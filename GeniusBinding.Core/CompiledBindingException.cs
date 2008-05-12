@@ -8,7 +8,9 @@ namespace GeniusBinding.Core
     /// <summary>
     /// Exception pour le binding compilé
     /// </summary>
+#if !SILVERLIGHT
     [Serializable]
+#endif
     public class CompiledBindingException : Exception
     {
         public CompiledBindingException(string message)
@@ -20,11 +22,12 @@ namespace GeniusBinding.Core
             : base(message, inner)
         {
         }
-
+#if !SILVERLIGHT
         public CompiledBindingException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
+#endif
 
     }
 }

@@ -36,7 +36,7 @@ namespace GeniusBinding.Core
         /// <param name="destination"></param>
         /// <param name="propertyPathdest"></param>
         /// <param name="converter"></param>
-        public PropertyPathBindingItem(object sourceTarget, string propertyPath, 
+        internal PropertyPathBindingItem(object sourceTarget, string propertyPath, 
                                         object destinationTarget, string propertyPathdest, 
                                         IBinderConverter converter, 
                                         SynchronizationContext applyBindingContext)
@@ -170,7 +170,7 @@ namespace GeniusBinding.Core
             _CurrentBinding.ForceUpdate();
         }
 
-        #region case for array a last position in PathItem
+        #region case for array at last position in PathItem
         private object CreateArrayWrapper(PathItem srcPathItem, PathItem destPathItem, out bool isValid, CollectionChangedDelegate onCollectionChanged)
         {
             isValid = true;

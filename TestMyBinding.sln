@@ -1,15 +1,58 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeniusBinding.Core", "GeniusBinding.Core\GeniusBinding.Core.csproj", "{5A70B4FB-7924-4BD1-B3C0-021E85916643}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestMyBinding", "TestMyBinding\TestMyBinding.csproj", "{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeniusBinding.Core.Tests", "GeniusBinding.Core.Tests\GeniusBinding.Core.Tests.csproj", "{2A6C8F32-CE25-4020-BAB7-9F977A8347E1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeniusBinding.SilverLight.Core", "GeniusBinding.SilverLight.Core\GeniusBinding.SilverLight.Core.csproj", "{1FC38311-A606-4247-A5D6-F596EDBC07BD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{F6695525-5460-4B32-AE54-E113B4CAF09C}"
+	ProjectSection(SolutionItems) = preProject
+		lib\nunit.framework.dll = lib\nunit.framework.dll
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F2214763-9067-48B9-8907-6A70ECDF57F5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{39CE46B0-647A-4EE3-A3E1-A27990704700}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WindowsForms", "WindowsForms", "{361B5C36-EFA7-44AA-8A8E-4FCF10C5E96C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Silverlight", "Silverlight", "{6919BAE2-2740-4B89-9EC2-7F49EB324B3A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SilverlightApplicationTestBinding", "SilverlightApplicationTestBinding\SilverlightApplicationTestBinding.csproj", "{E7316FF6-A509-4045-A8BB-4C97D201C5C3}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "SilverlightApplicationTestBinding_Web", "SilverlightApplicationTestBinding_Web", "{C793BE07-FA36-47D3-9EF0-CB4AD40879BB}"
+	ProjectSection(WebsiteProperties) = preProject
+		SccProjectName = "SAK"
+		SccAuxPath = "SAK"
+		SccLocalPath = "SAK"
+		SccProvider = "SAK"
+		TargetFramework = "3.5"
+		Debug.AspNetCompiler.VirtualPath = "/SilverlightApplicationTestBinding_Web"
+		Debug.AspNetCompiler.PhysicalPath = "SilverlightApplicationTestBinding_Web\"
+		Debug.AspNetCompiler.TargetPath = "..\Latest\SilverlightApplicationTestBinding\PrecompiledWeb\SilverlightApplicationTestBinding_Web\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/SilverlightApplicationTestBinding_Web"
+		Release.AspNetCompiler.PhysicalPath = "SilverlightApplicationTestBinding_Web\"
+		Release.AspNetCompiler.TargetPath = "..\Latest\SilverlightApplicationTestBinding\PrecompiledWeb\SilverlightApplicationTestBinding_Web\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "2106"
+		DefaultWebSiteLanguage = "Visual C#"
+		ProjOutputReferences = "{E7316FF6-A509-4045-A8BB-4C97D201C5C3}|;"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 4
+		SccNumberOfProjects = 7
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs03.codeplex.com/
 		SccLocalPath0 = .
@@ -17,31 +60,107 @@ Global
 		SccProjectName1 = GeniusBinding.Core
 		SccLocalPath1 = GeniusBinding.Core
 		SccProjectUniqueName2 = TestMyBinding\\TestMyBinding.csproj
+		SccProjectTopLevelParentUniqueName2 = TestMyBinding.sln
 		SccProjectName2 = TestMyBinding
 		SccLocalPath2 = TestMyBinding
 		SccProjectUniqueName3 = GeniusBinding.Core.Tests\\GeniusBinding.Core.Tests.csproj
+		SccProjectTopLevelParentUniqueName3 = TestMyBinding.sln
 		SccProjectName3 = GeniusBinding.Core.Tests
 		SccLocalPath3 = GeniusBinding.Core.Tests
+		SccProjectUniqueName4 = GeniusBinding.SilverLight.Core\\GeniusBinding.SilverLight.Core.csproj
+		SccProjectName4 = GeniusBinding.SilverLight.Core
+		SccLocalPath4 = GeniusBinding.SilverLight.Core
+		SccProjectUniqueName5 = SilverlightApplicationTestBinding\\SilverlightApplicationTestBinding.csproj
+		SccProjectTopLevelParentUniqueName5 = TestMyBinding.sln
+		SccProjectName5 = SilverlightApplicationTestBinding
+		SccLocalPath5 = SilverlightApplicationTestBinding
+		SccWebProject6 = true
+		SccProjectUniqueName6 = SilverlightApplicationTestBinding_Web
+		SccProjectTopLevelParentUniqueName6 = TestMyBinding.sln
+		SccProjectName6 = SilverlightApplicationTestBinding_Web
+		SccLocalPath6 = .
+		SccProjectFilePathRelativizedFromConnection6 = SilverlightApplicationTestBinding_Web\\
+		SccProjectEnlistmentChoice6 = 2
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|.NET = Debug|.NET
 		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Release|.NET = Release|.NET
 		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5A70B4FB-7924-4BD1-B3C0-021E85916643}.Debug|.NET.ActiveCfg = Debug|Any CPU
 		{5A70B4FB-7924-4BD1-B3C0-021E85916643}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5A70B4FB-7924-4BD1-B3C0-021E85916643}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A70B4FB-7924-4BD1-B3C0-021E85916643}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{5A70B4FB-7924-4BD1-B3C0-021E85916643}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{5A70B4FB-7924-4BD1-B3C0-021E85916643}.Release|.NET.ActiveCfg = Release|Any CPU
 		{5A70B4FB-7924-4BD1-B3C0-021E85916643}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A70B4FB-7924-4BD1-B3C0-021E85916643}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A70B4FB-7924-4BD1-B3C0-021E85916643}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{5A70B4FB-7924-4BD1-B3C0-021E85916643}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}.Debug|.NET.ActiveCfg = Debug|Any CPU
 		{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}.Release|.NET.ActiveCfg = Release|Any CPU
 		{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{FBDDBC48-C171-4457-8B84-D0DA6E950EC6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{2A6C8F32-CE25-4020-BAB7-9F977A8347E1}.Debug|.NET.ActiveCfg = Debug|Any CPU
 		{2A6C8F32-CE25-4020-BAB7-9F977A8347E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2A6C8F32-CE25-4020-BAB7-9F977A8347E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A6C8F32-CE25-4020-BAB7-9F977A8347E1}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{2A6C8F32-CE25-4020-BAB7-9F977A8347E1}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{2A6C8F32-CE25-4020-BAB7-9F977A8347E1}.Release|.NET.ActiveCfg = Release|Any CPU
 		{2A6C8F32-CE25-4020-BAB7-9F977A8347E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A6C8F32-CE25-4020-BAB7-9F977A8347E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A6C8F32-CE25-4020-BAB7-9F977A8347E1}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{2A6C8F32-CE25-4020-BAB7-9F977A8347E1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{1FC38311-A606-4247-A5D6-F596EDBC07BD}.Debug|.NET.ActiveCfg = Debug|Any CPU
+		{1FC38311-A606-4247-A5D6-F596EDBC07BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FC38311-A606-4247-A5D6-F596EDBC07BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FC38311-A606-4247-A5D6-F596EDBC07BD}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{1FC38311-A606-4247-A5D6-F596EDBC07BD}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{1FC38311-A606-4247-A5D6-F596EDBC07BD}.Release|.NET.ActiveCfg = Release|Any CPU
+		{1FC38311-A606-4247-A5D6-F596EDBC07BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FC38311-A606-4247-A5D6-F596EDBC07BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FC38311-A606-4247-A5D6-F596EDBC07BD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{1FC38311-A606-4247-A5D6-F596EDBC07BD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E7316FF6-A509-4045-A8BB-4C97D201C5C3}.Debug|.NET.ActiveCfg = Debug|Any CPU
+		{E7316FF6-A509-4045-A8BB-4C97D201C5C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7316FF6-A509-4045-A8BB-4C97D201C5C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7316FF6-A509-4045-A8BB-4C97D201C5C3}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E7316FF6-A509-4045-A8BB-4C97D201C5C3}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{E7316FF6-A509-4045-A8BB-4C97D201C5C3}.Release|.NET.ActiveCfg = Release|Any CPU
+		{E7316FF6-A509-4045-A8BB-4C97D201C5C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7316FF6-A509-4045-A8BB-4C97D201C5C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7316FF6-A509-4045-A8BB-4C97D201C5C3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E7316FF6-A509-4045-A8BB-4C97D201C5C3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{C793BE07-FA36-47D3-9EF0-CB4AD40879BB}.Debug|.NET.ActiveCfg = Debug|.NET
+		{C793BE07-FA36-47D3-9EF0-CB4AD40879BB}.Debug|.NET.Build.0 = Debug|.NET
+		{C793BE07-FA36-47D3-9EF0-CB4AD40879BB}.Debug|Any CPU.ActiveCfg = Debug|.NET
+		{C793BE07-FA36-47D3-9EF0-CB4AD40879BB}.Debug|Mixed Platforms.ActiveCfg = Debug|.NET
+		{C793BE07-FA36-47D3-9EF0-CB4AD40879BB}.Debug|Mixed Platforms.Build.0 = Debug|.NET
+		{C793BE07-FA36-47D3-9EF0-CB4AD40879BB}.Release|.NET.ActiveCfg = Debug|.NET
+		{C793BE07-FA36-47D3-9EF0-CB4AD40879BB}.Release|.NET.Build.0 = Debug|.NET
+		{C793BE07-FA36-47D3-9EF0-CB4AD40879BB}.Release|Any CPU.ActiveCfg = Debug|.NET
+		{C793BE07-FA36-47D3-9EF0-CB4AD40879BB}.Release|Mixed Platforms.ActiveCfg = Debug|.NET
+		{C793BE07-FA36-47D3-9EF0-CB4AD40879BB}.Release|Mixed Platforms.Build.0 = Debug|.NET
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{361B5C36-EFA7-44AA-8A8E-4FCF10C5E96C} = {39CE46B0-647A-4EE3-A3E1-A27990704700}
+		{6919BAE2-2740-4B89-9EC2-7F49EB324B3A} = {39CE46B0-647A-4EE3-A3E1-A27990704700}
+		{2A6C8F32-CE25-4020-BAB7-9F977A8347E1} = {F2214763-9067-48B9-8907-6A70ECDF57F5}
+		{FBDDBC48-C171-4457-8B84-D0DA6E950EC6} = {361B5C36-EFA7-44AA-8A8E-4FCF10C5E96C}
+		{E7316FF6-A509-4045-A8BB-4C97D201C5C3} = {6919BAE2-2740-4B89-9EC2-7F49EB324B3A}
+		{C793BE07-FA36-47D3-9EF0-CB4AD40879BB} = {6919BAE2-2740-4B89-9EC2-7F49EB324B3A}
 	EndGlobalSection
 EndGlobal
