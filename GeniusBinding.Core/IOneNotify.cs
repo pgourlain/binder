@@ -9,7 +9,7 @@ namespace GeniusBinding.Core
     /// </summary>
     interface IOneNotify : IDisposable
     {
-        void Fire(WeakReference weak);
+        void Fire(EqualityWeakReference weak);
 
         bool Enabled { get; set;}
 

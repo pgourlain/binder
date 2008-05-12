@@ -1,19 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Security;
 
 namespace GeniusBinding.Core
 {
     /// <summary>
     /// le but de cette classe est de ne maintenir que des références "faibles" sur les objets bindés
     /// </summary>
-    sealed class EqualityWeakReference : WeakReference
+    class EqualityWeakReference : WeakReference
     {
         // Fields
         private int _hashCode;
 
         // Methods
-        internal EqualityWeakReference(object o)
+        public EqualityWeakReference(object o)
             : base(o)
         {
             this._hashCode = o.GetHashCode();

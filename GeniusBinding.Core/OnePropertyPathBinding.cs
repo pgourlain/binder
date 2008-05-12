@@ -7,7 +7,19 @@ using System.Collections;
 
 namespace GeniusBinding.Core
 {
+    /// <summary>
+    /// delegate factory, it use to create a delegate (wha to do when an itermediate property changed)
+    /// </summary>
+    /// <param name="currentIndex">current index, when the binding is an indexed binding</param>
+    /// <param name="weakSource">the source for the current binding</param>
+    /// <returns><see cref="OnChangeDelegate"/>, which notify when the current property changed</returns>
     delegate OnChangeDelegate<object> OnChangeDelegateFactoryDelegate(int currentIndex, EqualityWeakReference weakSource);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="pi"></param>
+    /// <param name="source"></param>
     delegate void OnBindLastItem(int index, PropertyInfo pi, object source);
     delegate void CollectionChangedDelegate();
 
@@ -93,7 +105,7 @@ namespace GeniusBinding.Core
         /// </summary>
         /// <param name="rootSource"></param>
         /// <param name="fullpath"></param>
-        /// <param name="factory"></param>
+        /// <param name="factory">what to do when an intermediate property changed</param>
         /// <param name="OnfinalBind"></param>
         public void Bind(object rootSource, string fullpath, OnChangeDelegateFactoryDelegate factory, OnBindLastItem OnfinalBind)
         {
@@ -192,6 +204,7 @@ namespace GeniusBinding.Core
             int intArrayIndex = pathitem.ArrayIndex;
 
             EqualityWeakReference weakSource;
+#if !SILVERLIGHT
             //Here source is a list, bindinglist, ... or has simply indexer
             if (source is IBindingList)
             {
@@ -212,7 +225,9 @@ namespace GeniusBinding.Core
                     source = null;
                 pathitem.ArrayWrapper = wrapper;
             }
-            else if (source is ICollectionChanged)
+            else 
+#endif
+            if (source is ICollectionChanged)
             {
                 weakSource = new EqualityWeakReference(source);
                 ((ICollectionChanged)source).CollectionChanged += delegate(object sender, CollectionChangedEventArgs e)
@@ -232,7 +247,13 @@ namespace GeniusBinding.Core
             }
             else
             {
-                source = null;
+                IList l = source as IList;
+                if (l != null)
+                {
+                    source = ((IList)source)[intArrayIndex];
+                }
+                else
+                    source = null;
             }
             return source;
         }
@@ -247,11 +268,13 @@ namespace GeniusBinding.Core
                 if (((IList)listSource).Count > intArrayIndex)
                     value = ((IList)listSource)[intArrayIndex];
             }
+#if !SILVERLIGHT
             else if (listSource is IBindingList)
             {
                 if (((IBindingList)listSource).Count > intArrayIndex)
                     value = ((IBindingList)listSource)[intArrayIndex];
             }
+#endif
             BindPropertyPath(value, currentIndex);
         }
 

@@ -174,10 +174,14 @@ namespace GeniusBinding.Core
             {
                 ((ICollectionChanged)collection).CollectionChanged += new EventHandler<CollectionChangedEventArgs>(ArrayWrapper_CollectionChanged);
             }
+#if !SILVERLIGHT  
             else if (collection is IBindingList)
             {
                 ((IBindingList)collection).ListChanged += new ListChangedEventHandler(ArrayWrapper_ListChanged);
             }
+#endif
+            //TODO: INotifyCollectionChanged
+
             _originalCollection = new WeakReference(collection);
             //_originalCollection = collection;
         }
@@ -193,6 +197,7 @@ namespace GeniusBinding.Core
             }
         }
 
+#if !SILVERLIGHT  
         void ArrayWrapper_ListChanged(object sender, ListChangedEventArgs e)
         {
             if (e.NewIndex == Index || e.OldIndex == Index)
@@ -203,7 +208,7 @@ namespace GeniusBinding.Core
                 }
             }
         }
-
+#endif
         public override T ArrayValue
         {
             get
@@ -240,10 +245,12 @@ namespace GeniusBinding.Core
                 {
                     ((ICollectionChanged)_originalCollection.Target).CollectionChanged -= ArrayWrapper_CollectionChanged;
                 }
+#if !SILVERLIGHT
                 else if (_originalCollection is IBindingList)
                 {
                     ((IBindingList)_originalCollection.Target).ListChanged -= new ListChangedEventHandler(ArrayWrapper_ListChanged);
                 }
+#endif
             }
         }
 

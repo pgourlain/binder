@@ -10,7 +10,7 @@ namespace GeniusBinding.Core
     /// </summary>
     class BindingListNotificationWrapper : ICollectionChanged, IDisposable
     {
-        private string _Index;
+        //private string _Index;
         private int _intIndex;
         WeakReference _Bindinglist;
         #region ICollectionChanged Members

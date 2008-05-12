@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="SilverlightApplicationTestBinding.OperatorsBinding"
+    xmlns="http://schemas.microsoft.com/client/2007" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    Width="250" Height="200" Loaded="UserControl_Loaded">
+    <Grid x:Name="LayoutRoot" Background="White">
+        <StackPanel HorizontalAlignment="Center">
+            <TextBlock Text="Test binding on custom class" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBox x:Name="vLeft" Width="70"/>
+                <TextBox x:Name="vRight" Width="70" Margin="50,0,0,0"/>
+            </StackPanel>
+            <Grid>
+                <Ellipse Width="50" Height="50" Fill="White" Stroke="Black" StrokeThickness="2"/>
+                <Rectangle Width="2" Height="30" Fill="Black"/>
+                <Rectangle Width="30" Height="2" Fill="Black"/>
+            </Grid>
+            <Grid>
+                <Rectangle Width="2" Height="30" Fill="Black" Margin="-8,10,0,0"/>
+                <Rectangle Width="2" Height="30" Fill="Black" Margin="8,10,0,0"/>
+            </Grid>
+            <Polygon Points="0,0,10,10,20,0" Fill="Black" HorizontalAlignment="Center">
+            </Polygon>
+            <Grid Background="Yellow">
+                <TextBlock Width="70" x:Name="vResult"/>
+            </Grid>
+            <!--<Button Content="test" Click="Button_Click"/>-->
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -56,7 +56,7 @@ namespace GeniusBinding.Core
             }
 
             #region IOneNotify
-            public void Fire(WeakReference weak)
+            public void Fire(EqualityWeakReference weak)
             {
                 if (weak.IsAlive && _BindingEnabled)
                 {
@@ -135,7 +135,7 @@ namespace GeniusBinding.Core
         /// <summary>
         /// liste des abonnements aux sources de données
         /// </summary>
-        static Dictionary<WeakReference, Dictionary<string, IOneNotify>> _SourceChanged = new Dictionary<WeakReference, Dictionary<string, IOneNotify>>();
+        static Dictionary<EqualityWeakReference, Dictionary<string, IOneNotify>> _SourceChanged = new Dictionary<EqualityWeakReference, Dictionary<string, IOneNotify>>();
         static List<IPropertyPathBinding> _Bindings = new List<IPropertyPathBinding>();
         
         #region notification
@@ -144,7 +144,7 @@ namespace GeniusBinding.Core
             INotifyPropertyChanged inotify = source as INotifyPropertyChanged;
             if (inotify != null)
             {
-                WeakReference weak = new EqualityWeakReference(inotify);
+                EqualityWeakReference weak = new EqualityWeakReference(inotify);
                 //le but est ici de ne s'abonner qu'une fois
                 Dictionary<string, IOneNotify> dico = null;
                 if (_SourceChanged.TryGetValue(weak, out dico))
@@ -169,7 +169,7 @@ namespace GeniusBinding.Core
             INotifyPropertyChanged inotify = source as INotifyPropertyChanged;
             if (inotify != null)
             {
-                WeakReference weak = new EqualityWeakReference(inotify);
+                EqualityWeakReference weak = new EqualityWeakReference(inotify);
                 //le but est ici de ne s'abonner qu'une fois
                 Dictionary<string, IOneNotify> dico = null;
                 if (!_SourceChanged.TryGetValue(weak, out dico))
@@ -205,7 +205,7 @@ namespace GeniusBinding.Core
                 EventInfo evInfo = source.GetType().GetEvent(eventName);
                 if (evInfo != null)
                 {
-                    WeakReference weak = new EqualityWeakReference(source);
+                    EqualityWeakReference weak = new EqualityWeakReference(source);
                     //le but est ici de ne s'abonner qu'une fois
                     Dictionary<string, IOneNotify> dico = null;
                     if (!_SourceChanged.TryGetValue(weak, out dico))
@@ -242,7 +242,7 @@ namespace GeniusBinding.Core
             INotifyPropertyChanged inotify = source as INotifyPropertyChanged;
             if (inotify != null)
             {
-                WeakReference weak = new EqualityWeakReference(inotify);
+                EqualityWeakReference weak = new EqualityWeakReference(inotify);
                 //le but est ici de ne s'abonner qu'une fois
                 Dictionary<string, IOneNotify> dico = null;
                 if (_SourceChanged.TryGetValue(weak, out dico))
@@ -262,7 +262,7 @@ namespace GeniusBinding.Core
                 EventInfo evInfo = source.GetType().GetEvent(eventName);
                 if (evInfo != null)
                 {
-                    WeakReference weak = new EqualityWeakReference(source);
+                    EqualityWeakReference weak = new EqualityWeakReference(source);
                     //le but est ici de ne s'abonner qu'une fois
                     Dictionary<string, IOneNotify> dico = null;
                     if (_SourceChanged.TryGetValue(weak, out dico))
@@ -288,6 +288,14 @@ namespace GeniusBinding.Core
         #endregion
 
         #region public methods
+        /// <summary>
+        /// Add a binding between 
+        /// </summary>
+        /// <param name="source">source to observe</param>
+        /// <param name="propertypath">path to observe</param>
+        /// <param name="destination">destination object</param>
+        /// <param name="destPropertypath">destination path</param>
+        /// source property should be convertible to destination property type.
         public static void AddCompiledBinding(object source, string propertypath, object destination, string destPropertypath)
         {
             Check.IsNotNull("source", source);
