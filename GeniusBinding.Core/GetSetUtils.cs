@@ -47,7 +47,7 @@ namespace GeniusBinding.Core
                 return (GetHandlerDelegate<TValue>)_Dico[getMethod];
             }
 #if SILVERLIGHT
-            //it's work, but at runtime a SecurityException is thrown
+            ////it's work, but at runtime a SecurityException is thrown
             //DynamicMethod dynamicGet = new DynamicMethod("DynamicGet" + propertyInfo.Name,
             //                                                typeof(TValue),
             //                                                new Type[] { typeof(object) }); 
@@ -56,6 +56,13 @@ namespace GeniusBinding.Core
             {
                 return (TValue)getMethod.Invoke(sender, null);
             };
+            //ILGenerator getGenerator = dynamicGet.GetILGenerator();
+            //getGenerator.Emit(OpCodes.Ldarg_0);
+            //getGenerator.Emit(OpCodes.Callvirt, getMethod);
+            //getGenerator.Emit(OpCodes.Ret); 
+            
+            //Type tDelegate = typeof(GetHandlerDelegate<TValue>);
+            //GetHandlerDelegate<TValue> Result = (GetHandlerDelegate<TValue>)dynamicGet.CreateDelegate(tDelegate);
 #else
             DynamicMethod dynamicGet = new DynamicMethod("DynamicGet"+propertyInfo.Name, 
                                                             typeof(TValue), 
@@ -94,8 +101,16 @@ namespace GeniusBinding.Core
             //                                                new Type[] { typeof(object), typeof(TValue) });
             SetHandlerDelegate<TValue> Result = delegate(object sender, TValue value)
             {
-                setMethod.Invoke(sender, new object[]{value});
+                setMethod.Invoke(sender, new object[] { value });
             };
+            //ILGenerator setGenerator = dynamicSet.GetILGenerator();
+
+            //setGenerator.Emit(OpCodes.Ldarg_0);
+            //setGenerator.Emit(OpCodes.Ldarg_1);
+            //setGenerator.Emit(OpCodes.Call, setMethod);
+            //setGenerator.Emit(OpCodes.Ret); 
+            //Type tDelegate = typeof(SetHandlerDelegate<TValue>);
+            //SetHandlerDelegate<TValue> Result = (SetHandlerDelegate<TValue>)dynamicSet.CreateDelegate(tDelegate);
 #else
             DynamicMethod dynamicSet = new DynamicMethod("DynamicSet" + propertyInfo.Name, 
                                                             typeof(void), 
