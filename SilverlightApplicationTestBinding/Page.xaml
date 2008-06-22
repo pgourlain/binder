@@ -22,7 +22,7 @@
         </StackPanel>
         <TextBlock Text="Default path" Grid.Row="1" />
         <StackPanel Grid.Row="1" Grid.Column="1" >
-            <lcl:ToolConfigUC x:Name="tDefault" VerticalAlignment="Top">
+            <lcl:ToolConfigUC Name="tDefault" VerticalAlignment="Top">
             </lcl:ToolConfigUC>        
             <Button Content="Reset default" Click="OnResetDefault"/>
         </StackPanel>

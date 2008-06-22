@@ -21,7 +21,6 @@ using SilverlightApplicationTestBinding.Model;
 namespace SilverlightApplicationTestBinding
 {
     [CompilerGenerated]
-    [SecurityTreatAsSafeAttribute]
     public partial class Page : UserControl
     {
         public Page()
