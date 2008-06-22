@@ -23,6 +23,8 @@
     <SccLocalPath>.</SccLocalPath>
     <SccAuxPath>https://tfs03.codeplex.com</SccAuxPath>
     <SccProvider>{4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}</SccProvider>
+    <ValidateXaml>true</ValidateXaml>
+    <ThrowErrorsInValidation>false</ThrowErrorsInValidation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -52,9 +54,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Windows.Browser" />
-    <Reference Include="System.Windows.Controls">
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Windows.Controls.Extended">
       <Private>True</Private>
     </Reference>
@@ -79,12 +78,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <SilverlightPage Include="App.xaml">
-      <Generator>MSBuild:CompileXaml</Generator>
-    </SilverlightPage>
-    <SilverlightPage Include="Page.xaml">
-      <Generator>MSBuild:CompileXaml</Generator>
-    </SilverlightPage>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:MarkupCompilePass1</Generator>
+    </ApplicationDefinition>
+    <Page Include="Page.xaml">
+      <Generator>MSBuild:MarkupCompilePass1</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AppManifest.xml" />
@@ -96,14 +95,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <SilverlightPage Include="ToolConfigUC.xaml">
-      <Generator>MSBuild:CompileXaml</Generator>
-    </SilverlightPage>
+    <Page Include="ToolConfigUC.xaml">
+      <Generator>MSBuild:MarkupCompilePass1</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
-    <SilverlightPage Include="OperatorsBinding.xaml">
-      <Generator>MSBuild:CompileXaml</Generator>
-    </SilverlightPage>
+    <Page Include="OperatorsBinding.xaml">
+      <Generator>MSBuild:MarkupCompilePass1</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight\v2.0\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

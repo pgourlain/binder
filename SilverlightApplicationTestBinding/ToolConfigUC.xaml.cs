@@ -25,12 +25,12 @@ namespace SilverlightApplicationTestBinding
             Binding b = new Binding("Tool.AssemblyPath");
             b.Source = this;
             b.Mode = BindingMode.TwoWay;
-            wt.SetBinding(WatermarkedTextBox.TextProperty, b);
+            wt.SetBinding(TextBox.TextProperty, b);
 
-            b = new Binding("Tool.DefaultPath");
-            b.Source = this;
-            b.Mode = BindingMode.TwoWay;
-            wt.SetBinding(WatermarkedTextBox.WatermarkProperty, b);
+            //b = new Binding("Tool.DefaultPath");
+            //b.Source = this;
+            //b.Mode = BindingMode.TwoWay;
+            //wt.SetBinding(WatermarkedTextBox.WatermarkProperty, b);
         }
 
         public ToolConfig Tool
